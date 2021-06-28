@@ -12,4 +12,6 @@ This is cope, a library for working with uncertainty in pose estimation. It incl
 - **Touch-based estimation in cluttered environment using particle filter**.
 
 Requirements and Installation
----------
+-----------------------------
+
+- cope req
