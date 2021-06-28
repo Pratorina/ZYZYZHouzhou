@@ -14,4 +14,4 @@ This is cope, a library for working with uncertainty in pose estimation. It incl
 Requirements and Installation
 -----------------------------
 
-- cope req
+- cope requires Python >= 2.7. If you do not already have a 
