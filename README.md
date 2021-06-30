@@ -14,4 +14,4 @@ This is cope, a library for working with uncertainty in pose estimation. It incl
 Requirements and Installation
 -----------------------------
 
-- cope requires Python >= 2.7. If you do not already have a Python environment configured on your computer, please see the instructions for installing the full [scientific Py
+- cope requires Python >= 2.7. If you do not already have a Python environment configured on your computer, please see the instructions for installing the full [scientific Python stack](https://scipy.org/install.
