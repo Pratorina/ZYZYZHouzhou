@@ -16,4 +16,4 @@ Requirements and Installation
 
 - cope requires Python >= 2.7. If you do not already have a Python environment configured on your computer, please see the instructions for installing the full [scientific Python stack](https://scipy.org/install.html).
 
-- Touch-based estimation module r
+- Touch-based estimation module requires *trimesh* for loading and using triangular
