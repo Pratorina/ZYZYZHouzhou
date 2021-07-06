@@ -20,4 +20,5 @@ Requirements and Installation
 
 - To install the latest version of cope:
 ```bash    
-   git clone https://github.com/dinhhu
+   git clone https://github.com/dinhhuy2109/python-cope.git
+   cd pyth
