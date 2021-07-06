@@ -19,4 +19,5 @@ Requirements and Installation
 - Touch-based estimation module requires *trimesh* for loading and using triangular meshes. To install *trimesh*, please see https://github.com/mikedh/trimesh
 
 - To install the latest version of cope:
-```bash   
+```bash    
+   git clone https://github.com/dinhhu
