@@ -23,3 +23,8 @@ Requirements and Installation
    git clone https://github.com/dinhhuy2109/python-cope.git
    cd python-cope
    sudo python setup.py install
+```
+
+
+Basic usage and examples
+-----
