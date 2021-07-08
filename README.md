@@ -29,4 +29,4 @@ Requirements and Installation
 Basic usage and examples
 ------------
 
-Please see the [wiki pa
+Please see the [wiki page](https://github.com/dinhhuy2109/python-cope/wiki
