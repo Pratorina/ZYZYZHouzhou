@@ -35,3 +35,57 @@ def TransformInv(T):
   @type T: array, shape (4,4)
   @param T: The input homogeneous transformation
   @rtype: array, shape (4,4)
+  @return: The inverse of the input homogeneous transformation
+  """
+  R = T[:3,:3].T
+  p = T[:3,3]
+  T_inv = np.identity(4)
+  T_inv[:3,:3] = R
+  T_inv[:3,3] = np.dot(-R, p)
+  return T_inv
+
+def TranValidate(T):
+  """
+  Validate T
+  @type T:    array 4x4 
+  @param T:   transformation matrix
+  """
+  raise NotImplementedError
+
+
+def RotValidate(C):
+  raise NotImplementedError
+
+
+def TranAd(T):
+  """
+  Compute Adjoint of 4x4 transformation matrix, return a 6x6 matrix
+  @type T:    array 4x4 
+  @param T:   transformation matrix
+  """
+  C = T[:3,:3]
+  r = T[:3,3]
+  AdT = np.zeros([6,6])
+  AdT[:3,:3] = C
+  AdT[:3,3:] = np.dot(Hat(r),C)
+  AdT[3:,3:] = C
+  return AdT
+
+
+def Hat(vec):
+  """
+  hat operator - return skew matrix (return 3x3 or 4x4 matrix) from vec
+  @param vec:   vector of 3 (rotation) or 6 (transformation)
+  """
+  if vec.shape[0] == 3: # skew from vec
+    return np.array([[0,-vec[2],vec[1]],[vec[2],0,-vec[0]],[-vec[1],vec[0],0]])
+  elif vec.shape[0] == 6:
+    vechat = np.zeros((4,4))
+    vechat[:3,:3] = Hat(vec[3:])
+    vechat[:3,3] = vec[:3]
+    return vechat
+  else:
+    raise ValueError("Invalid vector length for hat operator\n")
+
+
+def VecFromSkew(r):
