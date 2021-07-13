@@ -89,3 +89,36 @@ def Hat(vec):
 
 
 def VecFromSkew(r):
+  return np.array([r[2,1],r[0,2],r[1,0]])
+
+
+def CurlyHat(vec):
+  """
+  Builds the 6x6 curly hat matrix from the 6x1 input
+  @param vec:          a 6x1 vector xi
+  @param veccurlyhat:  a 6x6 matrix 
+  """
+  veccurlyhat = np.zeros((6,6))
+  veccurlyhat[:3,:3] = Hat(vec[3:])
+  veccurlyhat[:3,3:] = Hat(vec[:3])
+  veccurlyhat[3:,3:] = Hat(vec[3:])
+  return veccurlyhat
+
+
+def CovOp1(A):
+  """ 
+  Covariance operator 1 - eq. 44
+  """
+  return -np.trace(A)*np.eye(3) + A
+
+ 
+def CovOp2(A,B):
+  """ 
+  Covariance operator 2 - eq. 45
+  """
+  return np.dot(CovOp1(A),CovOp1(B)) + CovOp1(np.dot(B,A))
+
+
+def TranToVec(T):
+  """
+  Compute the matrix log of the transformation matrix T
