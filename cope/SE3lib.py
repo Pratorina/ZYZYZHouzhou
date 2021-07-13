@@ -122,3 +122,46 @@ def CovOp2(A,B):
 def TranToVec(T):
   """
   Compute the matrix log of the transformation matrix T
+  Convert from T to xi
+  @param T:       4x4
+  @param return:  return a 6x1 vector in tangent coordinates computed from T.
+  """
+  C = T[:3,:3]
+  r = T[:3,3]
+  
+  phi = RotToVec(C)
+  invJ = VecToJacInv(phi)
+  
+  rho = np.dot(invJ,r)
+  return np.hstack([rho,phi])
+
+
+# def RotToVec(C):
+#   """
+#   Compute the matrix log of the rotation matrix C
+#   @param C:      3x3
+#   @param return: Return a 3x1 vector (axis*angle) computed from C
+#   """
+#   #rotValidate(C)
+#   if(abs(np.trace(C)+1)>1e-10):
+#     if(np.linalg.norm(C-np.eye(3))<=1e-10):
+#       return np.zeros(3)
+#     else:
+#       phi = np.arccos((np.trace(C)-1)/2)
+#       return VecFromSkew(phi/(2*np.sin(phi))*(C-C.T))
+#   else:
+#     eigval, eigvect = np.linalg.eig(C)
+#     for (i,val) in enumerate(eigval):
+#       if abs((val-1)) <= 1e-10:
+#         return np.pi*np.real(eigvect[:,i])
+
+def RotToVec(C):
+  """
+  Compute the matrix log of the rotation matrix C
+  @param C:      3x3
+  @param return: Return a 3x1 vector (axis*angle) computed from C
+  """
+  # RotValidate(C)
+  epsilon = 0.0001
+  epsilon2 = 0.001
+  if ((abs(C[0,1]-C[1,0])<epsilon) and (abs(C[0,2]-C[2,0])<epsilon) and (abs(C[1,2]-C[2,1])<epsilon)):
