@@ -214,3 +214,46 @@ def RotToVec(C):
         
   angle = np.arccos(( C[0,0] + C[1,1] + C[2,2] - 1)/2.)
   x = (C[2,1] - C[1,2])/s
+  y = (C[0,2] - C[2,0])/s
+  z = (C[1,0] - C[0,1])/s
+  return angle*np.array((x,y,z))
+
+def VecToRot(phi):
+  """
+  Return a rotation matrix computed from the input vec (phi 3x1)
+  @param phi: 3x1 vector (input)
+  @param C:   3x3 rotation matrix (output)
+  """
+  tiny = 1e-12
+  #check for small angle
+  nr = np.linalg.norm(phi)
+  if nr < tiny:
+    #~ # If the angle (nr) is small, fall back on the series representation.
+    # C = VecToRotSeries(phi,10)
+    C = np.eye(3)
+  else:
+    R = Hat(phi)
+    C = np.eye(3) + np.sin(nr)/nr*R + (1-np.cos(nr))/(nr*nr)*np.dot(R,R)
+  return C
+
+
+def VecToRotSeries(phi, N):
+  """"
+  Build a rotation matrix using the exponential map series with N elements in the series 
+  @param phi: 3x1 vector
+  @param N:   number of terms to include in the series
+  @param C:   3x3 rotation matrix (output)
+  """
+  C = np.eye(3)
+  xM = np.eye(3)
+  cmPhi = Hat(phi)
+  for n in range(N):
+    xM = np.dot(xM, cmPhi)/(n+1)
+    C = C + xM
+  # Project the resulting rotation matrix back onto SO(3)
+  C = np.dot(C,np.linalg.inv(scipy.linalg.sqrtm(np.dot(C.T,C))))
+  return C
+
+
+def cot(x):
+  return 1./np.tan(x)
