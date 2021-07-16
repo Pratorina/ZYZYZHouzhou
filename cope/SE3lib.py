@@ -303,3 +303,36 @@ def VecToJacInvSeries(vec,N):
   @param N:    number of terms to include in the series
   @param invJ: 3x3 inv(J) matrix or 6x6 inv(J) matrix (output)
   """
+  if vec.shape[0] == 3: # invJacobian of SO3
+    invJSO3 = np.eye(3)
+    pxn = np.eye(3)
+    px = Hat(vec)
+    for n in range(N):
+      pxn = np.dot(pxn,px)/(n+1)
+      invJSO3 = invJSO3 + BernoulliNumber(n+1)*pxn
+    return invJSO3
+  elif vec.shape[0] == 6: # invJacobian of SE3
+    invJSE3 =np.eye(6)
+    pxn = np.eye(6)
+    px = CurlyHat(vec)
+    for n in range(N):
+      pxn = np.dot(pxn,px)/(n+1)
+      invJSE3 = invJSE3 + BernoulliNumber(n+1)*pxn
+    return invJSE3
+  else:
+    raise ValueError("Invalid input vector length\n")
+
+
+def BernoulliNumber(n):
+  """
+  Generate Bernoulli number
+  @param n:  interger (0,1,2,...)
+  """
+  from fractions import Fraction as Fr
+  if n == 1: return -0.5
+  A = [0] * (n+1)
+  for m in range(n+1):
+    A[m] = Fr(1, m+1)
+    for j in range(m, 0, -1):
+      A[j-1] = j*(A[j-1] - A[j])
+  return A[0].numerator*1./A[0].denominator # (which is Bn)
