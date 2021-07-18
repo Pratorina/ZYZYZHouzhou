@@ -377,3 +377,50 @@ def VecToJac(vec):
 
 
 def VecToJacSeries(vec,N):
+  """ 
+  Construction of the J matrix from Taylor series
+  @param vec: a 3x1 vector for SO3 or a 6x1 vector for SE3 (input)
+  @param N:   number of terms to include in the series (input)
+  @param J:   a 3x3 J matrix for SO3 or a 6x6 J matrix for SE3 (output)
+  """
+  if vec.shape[0] == 3: # Jacobian of SO3
+    JSO3 = np.eye(3)
+    pxn = np.eye(3)
+    px = Hat(vec)
+    for n in range(N):
+      pxn = np.dot(pxn,px)/(n+2)
+      JSO3 = JSO3 + pxn
+    return JSO3
+  elif vec.shape[0] == 6: # Jacobian of SE3
+    JSE3 = np.eye(6)
+    pxn = np.eye(6)
+    px = CurlyHat(vec)
+    for n in range(N):
+      pxn = np.dot(pxn,px)/(n+2)
+      JSE3 = JSE3 + pxn
+    return JSE3
+  else:
+    raise ValueError("Invalid input vector length\n")
+  return
+
+
+def VecToQ(vec):
+  """
+  @param vec: a 6x1 vector (input)
+  @param Q:   the 3x3 Q matrix (output)
+  """
+  rho = vec[:3]
+  phi = vec[3:]
+  
+  nr = np.linalg.norm(phi)
+  if nr == 0:
+    nr = 1e-12
+  nr2 = nr*nr
+  nr3 = nr2*nr
+  nr4 = nr3*nr
+  nr5 = nr4*nr
+  
+  cnr = np.cos(nr)
+  snr = np.sin(nr)
+  
+  rx = Hat(rho)
