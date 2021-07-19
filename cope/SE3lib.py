@@ -424,3 +424,56 @@ def VecToQ(vec):
   snr = np.sin(nr)
   
   rx = Hat(rho)
+  px = Hat(phi)
+  
+  t1 = 0.5*rx
+  t2 = ((nr-snr)/nr3)*(np.dot(px,rx) + np.dot(rx,px) + np.dot(np.dot(px,rx),px))
+  m3 = (1-0.5*nr2 - cnr)/nr4
+  t3 = -m3*(np.dot(np.dot(px,px),rx) +np.dot(np.dot(rx,px),px) -3*np.dot(np.dot(px,rx),px))
+  m4 = 0.5*(m3 - 3*(nr - snr -nr3/6)/nr5)
+  t4 = -m4*(np.dot(px,np.dot(np.dot(rx,px),px)) + np.dot(px,np.dot(np.dot(px,rx),px)))
+  Q = t1 + t2 + t3 + t4
+  return Q
+
+
+def VecToTran(vec):
+  """
+  Build a transformation matrix using the exponential map, closed form
+  @param vec: 6x1 vector (input)
+  @param T:   4x4 transformation matrix (output)
+  """
+  rho = vec[:3]
+  phi = vec[3:]
+  
+  C = VecToRot(phi)
+  JSO3 = VecToJac(phi)
+  
+  T = np.eye(4)
+  T[:3,:3] = C
+  T[:3,3] = np.dot(JSO3,rho)
+  return T
+
+
+def VecToTranSeries(p, N):
+  """
+  Build a transformation matrix using the exponential map series with N elements in the series
+  @param p: 6x1 vector (input)
+  @param N: number of terms to include in the series (input)
+  @param T: 4x4 transformation matrix (output)
+  """
+  T = np.eye(4)
+  xM = np.eye(4)
+  bpP = Hat(p)
+  for n in range(N):
+    xM = np.dot(xM, bpP/(n+1))
+    T = T + xM
+  return T
+
+
+def Propagating(T1, sigma1, T2, sigma2, method = 2):
+  """
+  Find the total uncertainty in a compound spatial relation (Compounding two uncertain transformations)
+  @param T1:     4x4 mean of left transformation 
+  @param sigma1: 6x6 covariance of left transformation
+  @param T2:     4x4 mean of right transformation
+  @param sigma2: 6x6 covariance of right transformations
