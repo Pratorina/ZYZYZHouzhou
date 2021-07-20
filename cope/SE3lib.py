@@ -477,3 +477,45 @@ def Propagating(T1, sigma1, T2, sigma2, method = 2):
   @param sigma1: 6x6 covariance of left transformation
   @param T2:     4x4 mean of right transformation
   @param sigma2: 6x6 covariance of right transformations
+  @param method: an integer indicating the method to be used to perform compounding
+                 (1=second-order, 2=fourth-order)
+  @param T:      4x4 mean of compounded transformation (output)
+  @param sigma:  6x6 covariance of compounded transformation (output)
+  """
+  # Compound the means
+  T = np.dot(T1,T2)
+  # Compute Adjoint of transformation T1
+  AdT1 = TranAd(T1)
+  sigma2prime = np.dot(np.dot(AdT1,sigma2),AdT1)
+  if method == 1:
+    # Second-order method
+    sigma = sigma1 + sigma2prime    
+  elif method == 2:
+    # Fourth-order method
+    sigma1rr = sigma1[:3,:3]
+    sigma1rp = sigma1[:3,3:]
+    sigma1pp = sigma1[3:,3:]
+    
+    sigma2rr = sigma2prime[:3,:3]
+    sigma2rp = sigma2prime[:3,3:]
+    sigma2pp = sigma2prime[3:,3:]
+    
+    A1 = np.zeros((6,6))
+    A1[:3,:3] = CovOp1(sigma1pp)
+    A1[:3,3:] = CovOp1(sigma1rp + sigma1rp.T)
+    A1[3:,3:] = CovOp1(sigma1pp)
+    
+    A2 = np.zeros((6,6))
+    A2[:3,:3] = CovOp1(sigma2pp)
+    A2[:3,3:] = CovOp1(sigma2rp + sigma2rp.T)
+    A2[3:,3:] = CovOp1(sigma2pp)
+
+    Brr = CovOp2(sigma1pp,sigma2rr) + CovOp2(sigma1rp.T,sigma2rp) + CovOp2(sigma1rp,sigma2rp.T) + CovOp2(sigma1rr,sigma2pp)
+    Brp = CovOp2(sigma1pp,sigma2rp.T) + CovOp2(sigma1rp.T,sigma2pp)
+    Bpp = CovOp2(sigma1pp, sigma2pp)
+    
+    B = np.zeros((6,6))
+    B[:3,:3] = Brr
+    B[:3,3:] = Brp
+    B[3:,:3] = Brp.T
+    B[3:,3:] = Bpp
