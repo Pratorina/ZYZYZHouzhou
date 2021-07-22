@@ -563,3 +563,43 @@ def Fusing(Tlist, sigmalist, N = 0, maxiterations=30, retiter=False):
     LHS = np.zeros(6)
     RHS = np.zeros(6)
     for k in range(kmax):
+      xik = TranToVec(np.dot(T,np.linalg.inv(Tlist[k])))
+      if N ==0:
+        invJ = VecToJacInv(xik)
+      else:
+        invJ = VecToJacInvSeries(xik, N)
+      invJtS = np.dot(invJ.T, np.linalg.inv(sigmalist[k]))
+      LHS = LHS + np.dot(invJtS,invJ)
+      RHS = RHS + np.dot(invJtS, xik)
+    xi = -np.linalg.solve(LHS,RHS)
+    # print "xi", xi
+    T = np.dot(VecToTran(xi),T)
+    # print "T", T
+    sigma = np.linalg.inv(LHS)
+    # How low did the objective function get?
+    V = 0.
+    for k in range(kmax):
+      xik = TranToVec(np.dot(T,np.linalg.inv(Tlist[k])))
+      V = V + np.dot(np.dot(xik.T,np.linalg.inv(sigmalist[k])),xik) / 2.
+    if abs(V - Vprv) < 1e-10:
+      break 
+    Vprv = V
+  if retiter:
+    return T, sigma, i+1
+  else:
+    return T, sigma
+
+def CovInverseTran(T,sigma):
+    """
+    Compute the cov of the inverse transformation. (Follow Ethan Eade's note on lie group.)
+    """
+    Tinv = np.linalg.inv(T)
+    AdTinv = TranAd(Tinv)
+    sigmaTinv = np.dot(np.dot(AdTinv,sigma),np.transpose(AdTinv))
+    return Tinv, sigmaTinv
+
+def CovInverseTranWithSeparateRotTrans(R,sigmaR,t,sigmat):
+    """
+    Compute the cov of the inverse transformation where Rot and Trans 's noises are assumed to be independent
+    """
+    Rinv = np.linalg.inv(R)
