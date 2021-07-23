@@ -603,3 +603,41 @@ def CovInverseTranWithSeparateRotTrans(R,sigmaR,t,sigmat):
     Compute the cov of the inverse transformation where Rot and Trans 's noises are assumed to be independent
     """
     Rinv = np.linalg.inv(R)
+    tinv = -np.dot(Rinv,t)
+    sigmaRinv = sigmaR
+    hatRinvt = Hat(np.dot(Rinv,t))
+    sigmatinv = np.dot(np.dot(hatRinvt,sigmaRinv),np.transpose(hatRinvt)) + np.dot(np.dot(Rinv,sigmat),R)
+    return Rinv, sigmaRinv, tinv, sigmatinv
+
+def Visualize(Tlist,sigmalist, nsamples = 100):
+  """
+  Visualize an estimation (a point will be used to represent the translation position of a transformation)
+  @param Tlist:     a list of Transformations
+  @param sigmalist: a list of corresponding sigmas
+  @param nsamples:  the number of samples generated for each (T,sigma)
+  """
+  import matplotlib.cm as cm
+  fig = plt.figure()
+  ax = fig.add_subplot(111, projection='3d')
+  cholsigmalist = []
+  colors = iter(cm.rainbow(np.linspace(0, 1, len(Tlist))))
+  for i in range(len(sigmalist)):
+    color = next(colors)
+    cholsigma = np.linalg.cholesky(sigmalist[i]).T
+    Tsample = []
+    for k in range(nsamples):
+      vecsample = np.dot(cholsigma,np.random.randn(6,1))
+      #vecsample = np.dot(cholsigma, np.random.uniform(-1,1,size = 6))
+      vecsample.resize(6)
+      Tsample = np.dot(VecToTran(vecsample), Tlist[i])
+      ax.scatter(Tsample[0,3],Tsample[1,3],Tsample[2,3], c = color)
+
+  ax.set_autoscaley_on(False)
+  ax.set_xlim([-0.5, 0.5])
+  ax.set_ylim([-0.5, 0.5])
+  ax.set_zlim([-0.5, 0.5])
+  ax.set_xlabel('X Label')
+  ax.set_ylabel('Y Label')
+  ax.set_zlabel('Z Label')
+  plt.show(False)
+  return True
