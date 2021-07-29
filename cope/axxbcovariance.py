@@ -90,3 +90,44 @@ def VisualizeCovariances(cov_rot, cov_trans, minx,maxx,miny,maxy):
   theta = np.degrees(np.arctan2(*vecs[:,0][::-1]))
   # Width and height are "full" widths, not radius
   width, height = 2 * nstd * np.sqrt(vals)
+  ellip1 = Ellipse(xy=pos, width=width, height=height, angle=theta,alpha=0.5,color='red', linewidth=2, fill=False)
+  ax.add_artist(ellip1)
+  plt.axis([minx,maxx,miny,maxy])
+  plt.xlabel(r'${\bf{\xi}}_{\bf{R} y} (rad)$',fontsize=20, labelpad=8)
+  plt.ylabel(r'${\bf{\xi}}_{\bf{R} z} (rad)$',fontsize=20, labelpad=-8)  
+  plt.xticks(np.arange(minx, maxx+maxx/2, (maxx-minx)/2))
+  plt.yticks(np.arange(miny, maxy+maxy/2, (maxy-miny)/2))
+  ax.set(aspect='equal')
+
+  plt.subplot(235)
+  mean = (0,0)
+  cov = cov_trans
+  cov = [[cov [1][1],cov [1][2]],[cov [2][1],cov [2][2]]]
+  pos=mean
+  ax = plt.gca()
+  vals, vecs = Eigsorted(cov)
+  theta = np.degrees(np.arctan2(*vecs[:,0][::-1]))
+  # Width and height are "full" widths, not radius
+  width, height = 2 * nstd * np.sqrt(vals)
+  ellip2 = Ellipse(xy=pos, width=width, height=height, angle=theta,alpha=0.5,color='red', linewidth=2, fill=False)
+  ax.add_artist(ellip2)
+  plt.axis([minx,maxx,miny,maxy])
+  plt.xlabel(r'${\bf{\xi}}_{\bf{t} y} (mm)$',fontsize=20, labelpad=8)
+  plt.ylabel(r'${\bf{\xi}}_{\bf{t} z} (mm)$',fontsize=20, labelpad=-8)
+  plt.xticks(np.arange(minx, maxx+maxx/2, (maxx-minx)/2))
+  plt.yticks(np.arange(miny, maxy+maxy/2, (maxy-miny)/2))
+  ax.set(aspect='equal')
+
+  ###################################################################
+
+  plt.subplot(233)
+  cov = cov_rot
+  cov = [[cov0 [0][0],cov0 [0][2]],[cov0 [2][0],cov0 [2][2]]]
+  pos = mean
+
+  ax = plt.gca()
+  vals, vecs = Eigsorted(cov)
+  theta = np.degrees(np.arctan2(*vecs[:,0][::-1]))
+  # Width and height are "full" widths, not radius
+  width, height = 2 * nstd * np.sqrt(vals)
+  ellip1 = Ellipse(xy=pos, width=width, height=height, angle=theta,alpha=0.5,color='red', linewidth=2, fill=False)
