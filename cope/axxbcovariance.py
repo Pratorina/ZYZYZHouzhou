@@ -224,3 +224,37 @@ def VisualizeRealEstCov(cov_real, cov_est, minx,maxx,miny,maxy,param):
     vals, vecs = Eigsorted(cov)
     theta = np.degrees(np.arctan2(*vecs[:,0][::-1]))
     # Width and height are "full" widths, not radius
+    width, height = 2 * nstd * np.sqrt(vals)
+    ellip1 = Ellipse(xy=pos, width=width, height=height, angle=theta,alpha=0.5,color='green',linewidth=2,linestyle='dashed', fill=False,label='Empirical Estimation')
+    ax.add_artist(ellip1)
+    
+    mean = (0,0)
+    cov = cov_est
+    cov = [[cov [1][1],cov [1][2]],[cov [2][1],cov [2][2]]]
+
+    pos=mean
+    ax = plt.gca()
+    vals, vecs = Eigsorted(cov)
+    theta = np.degrees(np.arctan2(*vecs[:,0][::-1]))
+    # Width and height are "full" widths, not radius
+    width, height = 2 * nstd * np.sqrt(vals)
+    ellip2 = Ellipse(xy=pos, width=width, height=height, angle=theta,alpha=0.5,color='red', linewidth=2, fill=False,label='Our algorithm')
+    ax.add_artist(ellip2)
+    ############real data
+    # plt.axis([-0.0025,0.0025,-0.002,0.0025])
+    #plt.axis([-0.018,0.018,-0.018,0.018])
+    ###############synthetic
+    # plt.axis([-0.00055,0.00055,-0.00055,0.00055])
+    plt.axis([minx,maxx,miny,maxy])
+    if param=='rot':
+        plt.xlabel(r'${\bf{\xi}}_{\bf{R} y} (rad)$',fontsize=20, labelpad=8)
+        plt.ylabel(r'${\bf{\xi}}_{\bf{R} z} (rad)$',fontsize=20, labelpad=-8)
+    if param=='trans':
+        plt.xlabel(r'${\bf{\xi}}_{\bf{t} y} (mm)$',fontsize=20, labelpad=8)
+        plt.ylabel(r'${\bf{\xi}}_{\bf{t} z} (mm)$',fontsize=20, labelpad=-8)
+    # plt.legend(handles=[ellip1, ellip2])
+    plt.xticks(np.arange(minx, maxx+maxx/2, (maxx-minx)/2))
+    plt.yticks(np.arange(miny, maxy+maxy/2, (maxy-miny)/2))
+    if param == 'rot':
+        plt.legend(handles=[ellip1, ellip2],loc='upper center',ncol=2, bbox_to_anchor=(0.5,1.5))
+    ax.set(aspect='equal')
