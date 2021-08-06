@@ -302,3 +302,42 @@ def VisualizeRealEstCov(cov_real, cov_est, minx,maxx,miny,maxy,param):
         plt.ylabel(r'${\bf{\xi}}_{\bf{t} z}(mm)$',fontsize=20, labelpad=-8)
     ax.set(aspect='equal')
     plt.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=0.8, hspace=None)
+    # plt.show(True)
+    
+    return True
+
+
+def FCParkSolution(alpha,beta,ta,tb):
+    # FCPark solution
+    # RotX
+    M = np.zeros(shape=(3,3))
+    for j in range(len(alpha)):
+        M = M + np.asmatrix(beta[j].reshape((3,1)))*np.asmatrix(alpha[j].reshape((3,1))).T
+        eig_val,eig_vec = np.linalg.eig(M.T * M)
+    FCPark_Rx =  np.asarray(eig_vec*np.diag(np.sqrt(1.0/eig_val))*np.linalg.inv(eig_vec)*M.T)
+    # Estimate tx
+    C = np.eye(3)-SE3.VecToRot(alpha[0])
+    for i in range(1,len(alpha)):
+        C = np.vstack((C,np.eye(3)-SE3.VecToRot(alpha[i])))
+    g = ta[0] - np.dot(FCPark_Rx,tb[0])
+    for i in range(1,len(alpha)):
+        g = np.vstack((g, ta[i] - np.dot(FCPark_Rx,tb[i])))
+    g = g.reshape(3*len(alpha),1)
+    FCPark_tx = np.dot(np.linalg.pinv(C),g).reshape(3)
+    return FCPark_Rx, FCPark_tx
+
+def IterativeSolutionTrans(beta, alpha, ta, tb, Rx, sigmaRa, sigmaRb, sigmata, sigmatb, sigmaRx,sigmaRbeta,txinit=np.zeros((3,1)), max_iter =10):
+    tx = txinit
+    i = 0
+    delta_tx = np.ones((3,1))
+    delta_xiRak = np.ones((3,1))
+    Ra = []
+    Rb = []
+    # compute covariance
+    inv_sigmaX = []
+    for k in range(len(alpha)):
+        Ra.append(SE3.VecToRot(alpha[k]))
+        Rb.append(SE3.VecToRot(beta[k]))
+        sigmaXk = np.zeros((6,6))
+        sigmaXk[:3,:3] = sigmaRa[k]
+        Rxtbk = np.dot(Rx,tb[k])
