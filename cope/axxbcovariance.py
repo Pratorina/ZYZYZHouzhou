@@ -379,3 +379,47 @@ def IterativeSolutionTrans(beta, alpha, ta, tb, Rx, sigmaRa, sigmaRb, sigmata, s
             Xkhat = np.zeros((6,1))
             if math.isnan((SE3.RotToVec(np.dot(Rahat[k], np.linalg.inv(Ra[k])))).reshape((3,1))[0]):
                 Xkhat[:3] = np.zeros((3,1))
+            else:
+                Xkhat[:3] = (SE3.RotToVec(np.dot(Rahat[k], np.linalg.inv(Ra[k])))).reshape((3,1))
+            Xkhat[3:6] = qhat[k].reshape(3,1)
+            ek = Xk - Xkhat
+            eA += np.dot(np.dot(np.transpose(Ak),inv_sigmaX[k]),ek)
+            eBk = np.dot(np.dot(np.transpose(Bk),inv_sigmaX[k]),ek)
+            eB.append(eBk)
+            sum1 += np.dot(Yk,np.transpose(Wk))
+            sum2 += np.dot(Yk,eBk)
+        delta_tx = np.dot(np.linalg.inv(U - sum1),eA - sum2)
+        tx = tx + delta_tx
+
+        for k in range(len(alpha)):
+            delta_xiRak = np.dot(np.linalg.inv(V[k]),(eB[k] - np.dot(np.transpose(W[k]),delta_tx)))
+            Rahat[k] = np.dot(SE3.VecToRot(delta_xiRak),Rahat[k])
+        i = i+1
+    # sigmatx = np.linalg.inv(U - sum1)
+    if i < max_iter:
+      return tx, np.linalg.inv(U - sum1), i
+    else:
+        return tx, np.linalg.inv(U - sum1), False
+
+def IterativeSolutionRot(beta,alpha,sigmaRa,sigmaRb,Rxinit=np.eye(3),max_iter = 10):
+    # Errors in A and B
+    Rhat = Rxinit
+    i = 0
+    betahat = copy.copy(beta)
+    deltaA = np.ones(3)
+    deltaBk = np.ones(3)
+    # TODO: changing the names of the variables
+    inv_sigmaX= []
+    for k in range(len(alpha)):
+        sigmaXk = np.zeros((6,6))
+        sigmaXk[3:6,3:6] = np.dot(np.dot(SE3.VecToJacInv(alpha[k]),sigmaRa),np.transpose(SE3.VecToJacInv(alpha[k])))
+        sigmaXk[:3,:3] = np.dot(np.dot(SE3.VecToJacInv(beta[k]),sigmaRb),np.transpose(SE3.VecToJacInv(beta[k])))
+        inv_sigmaXk = np.linalg.inv(sigmaXk)
+        inv_sigmaX.append(inv_sigmaXk)
+    while np.linalg.norm(deltaA)>1e-10 and i < max_iter:
+        Ak = np.zeros((6,3))
+        Bk = np.zeros((6,3))
+        Bk[:3,:] = np.eye(3)
+        U = np.zeros((3,3))
+        eA = np.zeros((3,1))
+        sum1 = np.zeros((3,3))
