@@ -341,3 +341,41 @@ def IterativeSolutionTrans(beta, alpha, ta, tb, Rx, sigmaRa, sigmaRb, sigmata, s
         sigmaXk = np.zeros((6,6))
         sigmaXk[:3,:3] = sigmaRa[k]
         Rxtbk = np.dot(Rx,tb[k])
+        sigmaXk[3:6,3:6] = sigmata + np.dot(np.dot(Rx,sigmatb),np.transpose(Rx)) + np.dot(np.dot(SE3.Hat(Rxtbk),sigmaRx),np.transpose(SE3.Hat(Rxtbk))) #sigmaqk
+        transposeJacalpha = np.transpose(SE3.VecToJac(alpha[k]))
+        sigmaRxRa = np.dot(np.dot(sigmaRx,np.transpose(SE3.Hat(np.dot(Rx,beta[k])))),transposeJacalpha )-np.dot(sigmaRbeta[k],np.dot(np.transpose(Rx),transposeJacalpha))
+        sigmaqRa= -np.dot(SE3.Hat(np.dot(Rx,ta[k])),sigmaRxRa)
+        sigmaXk[3:,:3] = sigmaqRa
+        sigmaXk[:3,3:] = np.transpose(sigmaqRa)
+        inv_sigmaX.append(np.linalg.inv(sigmaXk))
+    # import IPython; IPython.embed()
+    Rahat = copy.copy(Ra)
+    # main loop
+    while np.linalg.norm(delta_tx) > 1e-5 and i < max_iter:
+        Ak = np.zeros((6,3))
+        Bk = np.zeros((6,3))
+        Bk[:3,:] = np.eye(3)
+        U = np.zeros((3,3))
+        eA = np.zeros((3,1))
+        sum1 = np.zeros((3,3))
+        sum2 = np.zeros((3,1))
+        V = []
+        W = []
+        eB = []
+        qhat = []
+        [qhat.append(np.dot(Ra_k-np.eye(3),tx)) for Ra_k in Rahat]
+        for k in range(len(alpha)):
+            Ak[3:6,:] = Ra[k]-np.eye(3)
+            Bk[3:6,:] = - SE3.Hat(np.dot(Rahat[k],tx))
+            U+= np.dot(np.dot(np.transpose(Ak),inv_sigmaX[k]),Ak)
+            Vk = np.dot(np.dot(np.transpose(Bk),inv_sigmaX[k]),Bk)
+            Wk = np.dot(np.dot(np.transpose(Ak),inv_sigmaX[k]),Bk)
+            V.append(Vk)
+            W.append(Wk)
+            Yk = np.dot(Wk,np.linalg.inv(Vk))
+            Xk = np.zeros((6,1))
+            Xk[:3] = np.zeros((3,1))
+            Xk[3:6] = (np.dot(Rx,tb[k])-ta[k]).reshape(3,1)
+            Xkhat = np.zeros((6,1))
+            if math.isnan((SE3.RotToVec(np.dot(Rahat[k], np.linalg.inv(Ra[k])))).reshape((3,1))[0]):
+                Xkhat[:3] = np.zeros((3,1))
