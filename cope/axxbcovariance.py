@@ -423,3 +423,42 @@ def IterativeSolutionRot(beta,alpha,sigmaRa,sigmaRb,Rxinit=np.eye(3),max_iter = 
         U = np.zeros((3,3))
         eA = np.zeros((3,1))
         sum1 = np.zeros((3,3))
+        sum2 = np.zeros((3,1))
+        V = []
+        W = []
+        eB = []
+        alphahat = []
+        Y  = []
+        [alphahat.append(np.dot(Rhat,betak)) for betak in betahat]
+        for k in range(len(alpha)):
+            Ak[3:6,:] = -SE3.Hat(np.dot(Rhat,betahat[k]))
+            Bk[3:6,:] = Rhat
+            U += np.dot(np.dot(np.transpose(Ak),inv_sigmaX[k]),Ak)
+            Vk = np.dot(np.dot(np.transpose(Bk),inv_sigmaX[k]),Bk)
+            Wk = np.dot(np.dot(np.transpose(Ak),inv_sigmaX[k]),Bk)
+            V.append(Vk)
+            W.append(Wk)
+            Yk = np.dot(Wk,np.linalg.inv(Vk))
+            Y.append(Yk)
+            Xk = np.zeros((6,1))
+            Xk[:3] = beta[k].reshape(3,1)
+            Xk[3:6] = alpha[k].reshape(3,1)
+            Xkhat = np.zeros((6,1))
+            Xkhat[:3] = betahat[k].reshape(3,1)
+            Xkhat[3:6] = alphahat[k].reshape(3,1)
+            ek = Xk - Xkhat
+            eA += np.dot(np.dot(np.transpose(Ak),inv_sigmaX[k]),ek)
+            eBk = np.dot(np.dot(np.transpose(Bk),inv_sigmaX[k]),ek)
+            eB.append(eBk)
+            sum1 += np.dot(Yk,np.transpose(Wk))
+            sum2 += np.dot(Yk,eBk)
+        deltaA = np.dot(np.linalg.inv(U - sum1),eA - sum2)
+        Rhat = np.dot(SE3.VecToRot(deltaA), Rhat)
+        for k in range(len(alpha)):
+            deltaBk = np.dot(np.linalg.inv(V[k]),(eB[k] - np.dot(np.transpose(W[k]),deltaA)))
+            betahat[k] = betahat[k] + deltaBk.reshape(3)
+        i +=1
+    if i < max_iter:
+        # import IPython; IPython.embed()
+        alphahat = []
+        [alphahat.append(np.dot(Rhat,betak)) for betak in betahat]
