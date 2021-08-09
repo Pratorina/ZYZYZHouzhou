@@ -462,3 +462,17 @@ def IterativeSolutionRot(beta,alpha,sigmaRa,sigmaRb,Rxinit=np.eye(3),max_iter = 
         # import IPython; IPython.embed()
         alphahat = []
         [alphahat.append(np.dot(Rhat,betak)) for betak in betahat]
+        sigmaRx = np.linalg.inv(U - sum1)
+        sigmaRbeta = [-np.dot(sigmaRx,Yn) for Yn in Y]
+        sigmabeta = [np.dot(np.dot(np.transpose(Y[n]),sigmaRx),Y[n])+np.linalg.inv(V[n]) for n in range(len(alpha))]
+        sigmanewRa = []
+        sigmaRRa = []
+        for n in range(len(alphahat)):
+            Jacalpha = SE3.VecToJac(alphahat[n])
+            JachatRbeta = -np.dot(Jacalpha,SE3.Hat(np.dot(Rhat,betahat[n])))
+            JacR = np.dot(Jacalpha,Rhat)
+            sigmanewRa.append(np.dot(JachatRbeta,np.dot(sigmaRx,np.transpose(JachatRbeta)))+np.dot(JacR,np.dot(sigmabeta[n],np.transpose(JacR)))+np.dot(JacR,np.dot(np.transpose(sigmaRbeta[n]),np.transpose(JachatRbeta)))+np.dot(JachatRbeta,np.dot(sigmaRbeta[n],np.transpose(JacR))))
+            sigmaRRa.append(np.dot(sigmaRbeta[n],np.transpose(JacR))+np.dot(sigmaRx,np.transpose(JachatRbeta)))
+        return Rhat, sigmaRx,i,betahat,alphahat,sigmaRbeta,sigmabeta,sigmanewRa,sigmaRRa
+    else:
+        return Rhat, np.linalg.inv(U - sum1), False,beta,alpha,None,None,None,None
