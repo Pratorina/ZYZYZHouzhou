@@ -87,3 +87,56 @@ def normalize(weights):
   sum_weights = np.sum(weights)
   if sum_weights == 0:
     return np.ones(len(weights))/len(weights)
+  for i in range(len(weights)):
+    norm_weights[i] = weights[i]/sum_weights
+  return norm_weights
+
+def ComputeNormalizedWeightsB(mesh,sorted_face,particles,measurements,pos_err,nor_err,tau):
+  num_particles = len(particles)
+  new_weights = np.zeros(num_particles)
+  for i in range(len(particles)):
+    T = np.linalg.inv(particles[i])
+    D = copy.deepcopy(measurements)
+    for d in D:
+      d[0] = np.dot(T[:3,:3],d[0]) + T[:3,3]
+      d[1] = np.dot(T[:3,:3],d[1])
+    total_energy = sum([FindminimumDistanceMeshOriginal(mesh,sorted_face,measurement,pos_err,nor_err)**2 for measurement in D])
+    new_weights[i] = (np.exp(-0.5*total_energy/tau))
+  return normalize(new_weights)
+
+def ComputeNormalizedWeights(mesh,sorted_face,particles,measurements,pos_err,nor_err,tau):
+  num_particles = len(particles)
+  new_weights = np.zeros(num_particles)
+  for i in range(len(particles)):
+    T = np.linalg.inv(particles[i])
+    D = copy.deepcopy(measurements)
+    for d in D:
+      d[0] = np.dot(T[:3,:3],d[0]) + T[:3,3]
+      d[1] = np.dot(T[:3,:3],d[1])
+    total_energy = sum([FindminimumDistanceMesh(mesh,sorted_face,measurement,pos_err,nor_err)**2 for measurement in D])
+    new_weights[i] = (np.exp(-0.5*total_energy/tau))
+  
+  return normalize(new_weights)
+
+
+def FindminimumDistanceMesh(mesh,sorted_face,measurement,pos_err,nor_err):
+    ref_vec = sorted_face[2]
+    sorted_angle = sorted_face[1]
+    face_idx = sorted_face[0]
+    angle =  np.arccos(np.dot(measurement[1],ref_vec))
+    idx = bisect.bisect_right(sorted_angle,angle)
+    if idx >= len(sorted_angle):
+      up_bound = idx
+    else:
+      up_bound = idx + bisect.bisect_right(sorted_angle[idx:],sorted_angle[idx]+sorted_angle[idx]-angle+nor_err)
+    if idx == 0:
+      low_bound = 0
+    else:
+      low_bound = bisect.bisect_left(sorted_angle[:idx],sorted_angle[idx-1]-(sorted_angle[idx-1]-angle)-nor_err)-1
+    dist = []
+    for i in range(low_bound,up_bound):
+        A,B,C = mesh.faces[face_idx[i]]
+        dist.append(CalculateDistanceFace([mesh.vertices[A],mesh.vertices[B],mesh.vertices[C],mesh.face_normals[face_idx[i]]],measurement,pos_err,nor_err))
+    return min(dist)
+
+def FindminimumDistanceMeshOriginal(mesh,sorted_face,measurement,pos_err,nor_err):
