@@ -59,3 +59,31 @@ def EvenDensityCover(region, M):
     num_existing = 0
     for p in particles:
       if IsInside(SE3.RotToVec(p[:3,:3]),center_vec_rot,delta_rot) and IsInside(p[:3,3],center_vec_trans,delta_trans):
+        num_existing += 1
+    for m in range(M-num_existing):
+      count = 0
+      accepted = False
+      while not accepted and count < 5:
+        new_vec_rot = np.random.uniform(-1,1,size = 3)*delta_rot + center_vec_rot
+        new_vec_trans = np.random.uniform(-1,1,size = 3)*delta_trans + center_vec_trans
+        count += 1
+        accepted = True
+        for k in range(i-1):
+          previous_center = region.particles[k]
+          previous_vec_rot = SE3.RotToVec(previous_center[:3,:3])
+          previous_vec_trans = previous_center[:3,3]
+          if IsInside(SE3.RotToVec(p[:3,:3]),previous_vec_rot,delta_rot) and IsInside(p[:3,3],previous_vec_trans,delta_trans):
+            accepted = False
+            break
+      if accepted:
+        new_p = np.eye(4)
+        new_p[:3,:3] = SE3.VecToRot(new_vec_rot)
+        new_p[:3,3] = new_vec_trans
+        particles.append(new_p)
+  return particles
+
+def normalize(weights):
+  norm_weights = np.zeros(len(weights))
+  sum_weights = np.sum(weights)
+  if sum_weights == 0:
+    return np.ones(len(weights))/len(weights)
