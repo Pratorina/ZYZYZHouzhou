@@ -190,3 +190,44 @@ def Pruning(list_particles, weights,percentage):
     new_list_p.append(list_particles[k]) 
   for i in range(num_particles):
     if i == 0:
+      pruned_list.append(new_list_p[i])
+    else:
+      if not np.allclose(np.dot(new_list_p[i],np.linalg.inv(new_list_p[i-1])),np.eye(4)):
+        # IPython.embed()
+        pruned_list.append(new_list_p[i])
+  return pruned_list
+      
+
+def Pruning_old(list_particles, weights,prune_percentage):
+  assert (len(list_particles)==len(weights)),"Wrong input data, length of list of particles are not equal to length of weight"
+  pruned_list = []
+  maxweight = 0
+  for w in weights:
+    if w > maxweight:
+      maxweight = w
+  threshold = prune_percentage*maxweight
+  for i in range(len(list_particles)):
+    if weights[i] > threshold:
+      pruned_list.append(list_particles[i])
+  return pruned_list
+
+def Visualize(mesh,particle,D=[]):
+  show_ = mesh.copy()
+  show_.apply_transform(particle)
+  color = np.array([  21, 51,  252, 255])
+  for face in show_.faces:
+    show_.visual.face_colors[face] = color
+  for facet in show_.facets:
+    show_.visual.face_colors[facet] = color
+  for d in D:
+    sphere = trimesh.creation.icosphere(3,0.0025)
+    TF = np.eye(4)
+    TF[:3,3] = d[0]
+    TF2 = np.eye(4)
+    angle = np.arccos(np.dot(d[1],np.array([0,0,1])))
+    vec = np.cross(d[1],np.array([0,0,1]))
+    TF2[:3,:3] = SE3.VecToRot(angle*vec)
+    TF2[:3,3] = d[0] + np.dot(SE3.VecToRot(angle*vec),np.array([0,0,0.1/2.]))
+    sphere.apply_transform(TF)
+    show_ += sphere
+  show_.show()
