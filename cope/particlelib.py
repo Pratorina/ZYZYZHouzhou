@@ -140,3 +140,53 @@ def FindminimumDistanceMesh(mesh,sorted_face,measurement,pos_err,nor_err):
     return min(dist)
 
 def FindminimumDistanceMeshOriginal(mesh,sorted_face,measurement,pos_err,nor_err):
+    dist = []
+    for i in range(len(mesh.faces)):
+        A,B,C = mesh.faces[i]
+        dist.append(CalculateDistanceFace([mesh.vertices[A],mesh.vertices[B],mesh.vertices[C],mesh.face_normals[i]],measurement,pos_err,nor_err))
+    return min(dist)
+
+def CalculateDistanceFace(face,measurement,pos_err,nor_err):
+    p1,p2,p3,nor = face
+    pos_measurement = measurement[0]
+    nor_measurement = measurement[1]
+    norm = lambda x: np.linalg.norm(x)
+    inner = lambda a, b: np.inner(a,b)
+    closest_point = trimesh.triangles.closest_point([[p1,p2,p3]],[pos_measurement])
+    diff_distance = norm(closest_point-pos_measurement)
+    diff_angle    = np.arccos(inner(nor, nor_measurement)/norm(nor)/norm(nor_measurement))
+    dist = np.sqrt(diff_distance**2/pos_err**2+diff_angle**2/nor_err**2)
+    return dist
+
+def CalculateMahaDistanceFace(face,measurement,pos_err,nor_err):
+  p1,p2,p3,nor = face
+  pos_measurement = measurement[0]
+  nor_measurement = measurement[1]
+  norm = lambda x: np.linalg.norm(x)
+  inner = lambda a, b: np.inner(a,b)
+  diff_distance   = norm(inner((pos_measurement-p1), nor)/norm(nor))
+  diff_angle      = np.arccos(inner(nor, nor_measurement)/norm(nor)/norm(nor_measurement))
+  dist = np.sqrt(diff_distance**2/pos_err**2+diff_angle**2/nor_err**2)
+  return dist
+
+
+def Pruning(list_particles, weights,percentage):
+  assert (len(list_particles)==len(weights)),"Wrong input data, length of list of particles are not equal to length of weight"
+  num_particles = len(list_particles)
+  pruned_list = []
+  new_list_p = []
+  new_list_w = []
+  c = np.zeros(num_particles)
+  c[0] = weights[0]
+  for i in range(num_particles-1):
+    c[i+1] = c[i] + weights[i+1]
+  u = np.zeros(num_particles)
+  u[0] = np.random.uniform(0,1)/num_particles
+  k = 0
+  for i in range(num_particles):
+    u[i] = u[0] + 1./num_particles*i
+    while (u[i] > c[k]):
+      k+=1
+    new_list_p.append(list_particles[k]) 
+  for i in range(num_particles):
+    if i == 0:
