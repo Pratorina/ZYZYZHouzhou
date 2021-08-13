@@ -231,3 +231,52 @@ def Visualize(mesh,particle,D=[]):
     sphere.apply_transform(TF)
     show_ += sphere
   show_.show()
+  return True
+
+def Volume(radius,dim):
+  return (np.pi**(dim/2.))/sp.special.gamma(dim/2.+1)*(radius**dim)
+
+
+def ScalingSeriesB(mesh,sorted_face, particles0, measurements, pos_err, nor_err, M, sigma0, sigma_desired, prune_percentage = 0.6,dim = 6, visualize = False):
+  """
+  @type  V0:  ParticleFilterLib.Region
+  @param V0:  initial uncertainty region
+  @param  D:  a list of measurements [p,n,o_n,o_p] p is the contacted point, n is the approaching vector (opposite to normal)
+  @param  M:  the no. of particles per neighborhood
+  @param delta_desired: terminal value of delta
+  @param dim: dimension of the state space (6 DOFs)
+  """ 
+  zoom = 2**(-1./6.)
+  delta_rot = np.max(np.linalg.cholesky(sigma0[3:,3:]).T)
+  delta_trans = np.max(np.linalg.cholesky(sigma0[:3,:3]).T)
+  delta_desired_rot = np.max(np.linalg.cholesky(sigma_desired[3:,3:]).T)
+  delta_desired_trans = np.max(np.linalg.cholesky(sigma_desired[:3,:3]).T)
+  N_rot  = np.log2(Volume(delta_rot,3)/Volume(delta_desired_rot,3))
+  N_trans = np.log2(Volume(delta_trans,3)/Volume(delta_desired_trans,3))
+  N = int(np.round(max(N_rot,N_trans)))
+  particles = particles0
+  V = Region(particles,delta_rot,delta_trans)
+  t1 = 0.
+  t2 = 0.
+  t3 = 0.
+  sum_num_particles = 0
+  for n in range(N):
+    delta_rot = delta_rot*zoom
+    delta_trans = delta_trans*zoom
+    tau = (delta_trans/delta_desired_trans)**(2./1.)
+    # Sample new set of particles based on from previous region and M
+    particles = EvenDensityCover(V,M)
+    # print "len of new generated particles ", len(particles)
+    # print 'tau ', tau
+    # Compute normalized weights
+    weights = ComputeNormalizedWeightsB(mesh,sorted_face,particles,measurements,pos_err,nor_err,tau)
+    # Prune based on weights
+    pruned_particles = Pruning_old(particles,weights,prune_percentage)
+    # print 'No. of particles, after pruning:', len(pruned_particles)
+    # Create a new region from the set of particle left after pruning
+    V = Region(pruned_particles,delta_rot,delta_trans)
+    # if visualize:
+    #   Visualize(visualize_mesh,particles,measurements)
+    sum_num_particles += len(particles)
+  new_set_of_particles = EvenDensityCover(V,M)
+  new_weights = ComputeNormalizedWeightsB(mesh,sorted_face,new_set_of_particles,measurements,pos_err,nor_err,1)
