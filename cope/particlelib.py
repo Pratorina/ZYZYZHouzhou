@@ -324,3 +324,47 @@ def ScalingSeries(mesh,sorted_face, particles0, measurements, pos_err, nor_err, 
 
 
 def GenerateMeasurementsTriangleSampling(mesh,pos_err,nor_err,num_measurements):
+  ## Generate random points on obj surfaces using triangle sampling
+  # For individual triangle sampling uses this method:
+  # http://mathworld.wolfram.com/TrianglePointPicking.html
+  # # len(mesh.faces) float array of the areas of each face of the mesh
+  # area = mesh.area_faces
+  # # total area (float)
+  # area_sum = np.sum(area)
+  # # cumulative area (len(mesh.faces))
+  # area_cum = np.cumsum(area)
+  # face_pick = np.random.random(num_measurements)*area_sum
+  # face_index = np.searchsorted(area_cum, face_pick)
+
+  face_w_normal_up = []
+  for i in range(len(mesh.faces)):
+    if np.dot(mesh.face_normals[i],np.array((0,0,1))) >= -0.1:
+      face_w_normal_up.append(i)
+  face_index = np.random.choice(face_w_normal_up,num_measurements)
+  # pull triangles into the form of an origin + 2 vectors
+  tri_origins = mesh.triangles[:, 0]
+  tri_vectors = mesh.triangles[:, 1:].copy()
+  tri_vectors -= np.tile(tri_origins, (1, 2)).reshape((-1, 2, 3))
+  # pull the vectors for the faces we are going to sample from
+  tri_origins = tri_origins[face_index]
+  tri_vectors = tri_vectors[face_index]
+  # randomly generate two 0-1 scalar components to multiply edge vectors by
+  random_lengths = np.random.random((len(tri_vectors), 2, 1))
+  # points will be distributed on a quadrilateral if we use 2 0-1 samples
+  # if the two scalar components sum less than 1.0 the point will be
+  # inside the triangle, so we find vectors longer than 1.0 and
+  # transform them to be inside the triangle
+  random_test = random_lengths.sum(axis=1).reshape(-1) > 1.0
+  random_lengths[random_test] -= 1.0
+  random_lengths = np.abs(random_lengths)
+  # multiply triangle edge vectors by the random lengths and sum
+  sample_vector = (tri_vectors * random_lengths).sum(axis=1)
+  # finally, offset by the origin to generate
+  # (n,3) points in space on the triangle
+  samples = sample_vector + tri_origins
+  normals = mesh.face_normals[face_index]
+  ## Transform points and add noise
+  # point_errs = np.random.multivariate_normal(np.zeros(3),np.eye(3),num_measurements)
+  random_vecs = np.random.uniform(-1,1,(num_measurements,3))
+  point_errs = np.asarray([np.random.normal(0.,np.sqrt(3)*pos_err)*random_vec/np.linalg.norm(random_vec) for random_vec in random_vecs])
+  noisy_points = copy.deepcopy(samples) + point_errs
