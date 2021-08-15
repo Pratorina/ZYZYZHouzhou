@@ -368,3 +368,38 @@ def GenerateMeasurementsTriangleSampling(mesh,pos_err,nor_err,num_measurements):
   random_vecs = np.random.uniform(-1,1,(num_measurements,3))
   point_errs = np.asarray([np.random.normal(0.,np.sqrt(3)*pos_err)*random_vec/np.linalg.norm(random_vec) for random_vec in random_vecs])
   noisy_points = copy.deepcopy(samples) + point_errs
+  noisy_normals = [np.dot(tr.rotation_matrix(np.random.normal(0.,nor_err),np.cross(np.random.uniform(-1,1,3),n))[:3,:3],n) for n in normals]
+  noisy_normals = np.asarray([noisy_n/np.linalg.norm(noisy_n) for noisy_n in noisy_normals])
+  dist = [np.linalg.norm(point_err) for point_err in point_errs]
+  alpha = [np.arccos(np.dot(noisy_normals[i],normals[i])) for i in range(len(normals))]
+
+  measurements = [[noisy_points[i],noisy_normals[i]] for i in range(num_measurements)]
+  return measurements #note that the normals here are sampled on obj surfaces
+
+
+def NormalHashing(obj,num_random_unit,plot_histogram):
+  entropy = 0.
+  for k in range(num_random_unit):
+    randR = tr.random_rotation_matrix()
+    ref_axis = np.dot(randR[:3,:3],np.array([0.,0.,1.]))   
+    mesh = []
+    angle_dict = []
+    for i in range(len(obj.faces)):
+      n = obj.face_normals[i]
+      angle = np.arccos(np.dot(n,ref_axis))
+      angle_dict.append(angle)
+      mesh.append([i,angle])
+    hist,bin_edges = np.histogram(angle_dict,range=(0,np.pi),density=True)
+    normalized_hist = hist/np.sum(hist)
+    if sp.stats.entropy(normalized_hist) > entropy: #histogram with bigger shannon entropy is selected
+      entropy = sp.stats.entropy(normalized_hist)
+      sorted_dict = [sorted(mesh,key=lambda f: f[1]),ref_axis]
+      toshow = normalized_hist,bin_edges
+  # print 'Selected unit vec:',sorted_dict[1]
+  # print 'Entropy:', entropy
+
+  if plot_histogram:
+    fig = plt.figure()
+    ax1 = fig.add_subplot(211)
+    width = 0.7*(toshow[1][1] - toshow[1][0])
+    center = (toshow[1][:-1] + toshow[1][1:])/2.
