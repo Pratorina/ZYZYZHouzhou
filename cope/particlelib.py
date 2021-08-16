@@ -403,3 +403,50 @@ def NormalHashing(obj,num_random_unit,plot_histogram):
     ax1 = fig.add_subplot(211)
     width = 0.7*(toshow[1][1] - toshow[1][0])
     center = (toshow[1][:-1] + toshow[1][1:])/2.
+    ax1.bar(center, toshow[0], align='center', width=width)
+    ax1.set_title("Hist of selected unit vec")
+
+    ax2 = fig.add_subplot(212)
+    width = 0.7*(bin_edges[1] - bin_edges[0])
+    center = (bin_edges[:-1] + bin_edges[1:])/2.
+    ax2.bar(center, normalized_hist, align='center', width=width)
+    ax2.set_title("Hist of a random unit vec")
+    fig.tight_layout()
+    plt.show(True)
+  face_idx = [sorted_dict[0][i][0] for i in range(len(sorted_dict[0]))]
+  angle_list = [sorted_dict[0][i][1] for i in range(len(sorted_dict[0]))]
+  mesh_w_sorted_dict = [face_idx,angle_list,sorted_dict[1]]
+  return mesh_w_sorted_dict # A list [[sorted_face_idx,angle],ref_axis]
+
+def RunImprovedScalingSeries(mesh,sorted_face, ptcls0, measurements, pos_err, nor_err, M, sigma0, sigma_desired, prune_percentage,dim = 6, visualize = False):
+   list_particles, weights = ScalingSeries(mesh,sorted_face, ptcls0, measurements, pos_err, nor_err, M, sigma0, sigma_desired, prune_percentage,dim = 6, visualize = False) 
+   maxweight = weights[0]
+   for w in weights:
+     if w > maxweight:
+       maxweight = w   
+   acum_weight = 0
+   acum_vec = np.zeros(6)
+   weight_threshold = 0.7*maxweight
+   for i in range(len(list_particles)):
+     if weights[i] > weight_threshold:
+       p = SE3.TranToVec(list_particles[i])
+       acum_vec += p*weights[i]
+       acum_weight += weights[i]
+   estimated_particle = acum_vec*(1./acum_weight)
+   return SE3.VecToTran(estimated_particle)
+
+def RunScalingSeries(mesh,sorted_face, ptcls0, measurements, pos_err, nor_err, M, sigma0, sigma_desired, prune_percentage,dim = 6, visualize = False):
+   list_particles, weights = ScalingSeriesB(mesh,sorted_face, ptcls0, measurements, pos_err, nor_err, M, sigma0, sigma_desired, prune_percentage,dim = 6, visualize = False) 
+   maxweight = weights[0]
+   for w in weights:
+     if w > maxweight:
+       maxweight = w   
+   acum_weight = 0
+   acum_vec = np.zeros(6)
+   weight_threshold = 0.7*maxweight
+   for i in range(len(list_particles)):
+     if weights[i] > weight_threshold:
+       p = SE3.TranToVec(list_particles[i])
+       acum_vec += p*weights[i]
+       acum_weight += weights[i]
+   estimated_particle = acum_vec*(1./acum_weight)
