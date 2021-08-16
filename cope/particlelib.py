@@ -450,3 +450,56 @@ def RunScalingSeries(mesh,sorted_face, ptcls0, measurements, pos_err, nor_err, M
        acum_vec += p*weights[i]
        acum_weight += weights[i]
    estimated_particle = acum_vec*(1./acum_weight)
+   return SE3.VecToTran(estimated_particle)
+
+def MeasurementFitHypothesis(hypothesis,measurement,pos_err,nor_err,mesh,sorted_face,distance_threshold):
+  d = copy.deepcopy(measurement)
+  T_inv = np.linalg.inv(hypothesis)
+  d[0] = np.dot(T_inv[:3,:3],d[0]) + T_inv[:3,3]
+  d[1] = np.dot(T_inv[:3,:3],d[1])
+  dist = FindminimumDistanceMeshOriginal(mesh,sorted_face,d,pos_err,nor_err)
+  if dist < distance_threshold:
+    return True
+  else: 
+    return False
+
+def ScoreHypothesis(hypothesis,measurements,pos_err,nor_err,mesh,sorted_face):
+  data = copy.deepcopy(measurements)
+  T_inv = np.linalg.inv(hypothesis)
+  dist = 0.
+  for d in data:
+    d[0] = np.dot(T_inv[:3,:3],d[0]) + T_inv[:3,3]
+    d[1] = np.dot(T_inv[:3,:3],d[1])
+  dist = sum([FindminimumDistanceMeshOriginal(mesh,sorted_face,d,pos_err,nor_err) for d in data])
+  score = dist/len(measurements)
+  return score
+
+def SelectRandomSubset(measurements,size,dist_angle_th):
+  if size <= 1:
+    # print 'Too few!'
+    quit()
+  all_idx = range(num_measurements)
+  subset_idx = []
+  while len(subset_idx) < size and len(all_idx)>0:
+    i = random.sample(all_idx,1)[0]
+    dist_angle = [np.arccos(np.dot(measurements[i][1],measurements[idx][1])) for idx in subset_idx]
+    too_close = []
+    for k in range(len(dist_angle)):
+      if dist_angle[k] > dist_angle_th:
+        too_close.append(k) 
+    if len(too_close) < 0.5*size: 
+      subset_idx.append(i)
+    all_idx.remove(i)
+  # print subset_idx
+  return subset_idx
+
+def RansacParticle(n,k,threshold,d,mesh,sorted_face, ptcls0, measurements, pos_err, nor_err, M, sigma0, sigma_desired, prune_percentage,dim = 6, visualize = False):
+  iterations = 0
+  best_hypothesis = ptcls0
+  best_score = 999.
+  num_measurements = len(measurements)
+  while iterations < k:
+    iterations += 1
+    maybeinliers_idx = random.sample(range(num_measurements),n)
+    maybeinliers = [measurements[i] for i in maybeinliers_idx] 
+    alsoinliers = []
