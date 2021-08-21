@@ -71,3 +71,46 @@ This module follows the "column vectors on the right" and "row major storage"
 (C contiguous) conventions. The translation components are in the right column
 of the transformation matrix, i.e. M[:3, 3].
 The transpose of the transformation matrices may have to be used to interface
+with other graphics systems, e.g. with OpenGL's glMultMatrixd(). See also [16].
+
+Calculations are carried out with numpy.float64 precision.
+
+Vector, point, quaternion, and matrix function arguments are expected to be
+"array like", i.e. tuple, list, or numpy arrays.
+
+Return types are numpy arrays unless specified otherwise.
+
+Angles are in radians unless specified otherwise.
+
+Quaternions w+ix+jy+kz are represented as [w, x, y, z].
+
+A triple of Euler angles can be applied/interpreted in 24 ways, which can
+be specified using a 4 character string or encoded 4-tuple:
+
+  *Axes 4-string*: e.g. 'sxyz' or 'ryxy'
+
+  - first character : rotations are applied to 's'tatic or 'r'otating frame
+  - remaining characters : successive rotation axis 'x', 'y', or 'z'
+
+  *Axes 4-tuple*: e.g. (0, 0, 0, 0) or (1, 1, 1, 1)
+
+  - inner axis: code of axis ('x':0, 'y':1, 'z':2) of rightmost matrix.
+  - parity : even (0) if inner axis 'x' is followed by 'y', 'y' is followed
+    by 'z', or 'z' is followed by 'x'. Otherwise odd (1).
+  - repetition : first and last axis are same (1) or different (0).
+  - frame : rotations are applied to static (0) or rotating (1) frame.
+
+Other Python packages and modules for 3D transformations and quaternions:
+
+* `Transforms3d <https://pypi.python.org/pypi/transforms3d>`_
+   includes most code of this module.
+* `Blender.mathutils <http://www.blender.org/api/blender_python_api>`_
+* `numpy-dtypes <https://github.com/numpy/numpy-dtypes>`_
+
+References
+----------
+(1)  Matrices and transformations. Ronald Goldman.
+     In "Graphics Gems I", pp 472-475. Morgan Kaufmann, 1990.
+(2)  More matrices and transformations: shear and pseudo-perspective.
+     Ronald Goldman. In "Graphics Gems II", pp 320-323. Morgan Kaufmann, 1991.
+(3)  Decomposing a matrix into simple transformations. Spencer Thomas.
