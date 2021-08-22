@@ -114,3 +114,42 @@ References
 (2)  More matrices and transformations: shear and pseudo-perspective.
      Ronald Goldman. In "Graphics Gems II", pp 320-323. Morgan Kaufmann, 1991.
 (3)  Decomposing a matrix into simple transformations. Spencer Thomas.
+     In "Graphics Gems II", pp 320-323. Morgan Kaufmann, 1991.
+(4)  Recovering the data from the transformation matrix. Ronald Goldman.
+     In "Graphics Gems II", pp 324-331. Morgan Kaufmann, 1991.
+(5)  Euler angle conversion. Ken Shoemake.
+     In "Graphics Gems IV", pp 222-229. Morgan Kaufmann, 1994.
+(6)  Arcball rotation control. Ken Shoemake.
+     In "Graphics Gems IV", pp 175-192. Morgan Kaufmann, 1994.
+(7)  Representing attitude: Euler angles, unit quaternions, and rotation
+     vectors. James Diebel. 2006.
+(8)  A discussion of the solution for the best rotation to relate two sets
+     of vectors. W Kabsch. Acta Cryst. 1978. A34, 827-828.
+(9)  Closed-form solution of absolute orientation using unit quaternions.
+     BKP Horn. J Opt Soc Am A. 1987. 4(4):629-642.
+(10) Quaternions. Ken Shoemake.
+     http://www.sfu.ca/~jwa3/cmpt461/files/quatut.pdf
+(11) From quaternion to matrix and back. JMP van Waveren. 2005.
+     http://www.intel.com/cd/ids/developer/asmo-na/eng/293748.htm
+(12) Uniform random rotations. Ken Shoemake.
+     In "Graphics Gems III", pp 124-132. Morgan Kaufmann, 1992.
+(13) Quaternion in molecular modeling. CFF Karney.
+     J Mol Graph Mod, 25(5):595-604
+(14) New method for extracting the quaternion from a rotation matrix.
+     Itzhack Y Bar-Itzhack, J Guid Contr Dynam. 2000. 23(6): 1085-1087.
+(15) Multiple View Geometry in Computer Vision. Hartley and Zissermann.
+     Cambridge University Press; 2nd Ed. 2004. Chapter 4, Algorithm 4.7, p 130.
+(16) Column Vectors vs. Row Vectors.
+     http://steve.hollasch.net/cgindex/math/matrix/column-vec.html
+
+Examples
+--------
+>>> alpha, beta, gamma = 0.123, -1.234, 2.345
+>>> origin, xaxis, yaxis, zaxis = [0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1]
+>>> I = identity_matrix()
+>>> Rx = rotation_matrix(alpha, xaxis)
+>>> Ry = rotation_matrix(beta, yaxis)
+>>> Rz = rotation_matrix(gamma, zaxis)
+>>> R = concatenate_matrices(Rx, Ry, Rz)
+>>> euler = euler_from_matrix(R, 'rxyz')
+>>> numpy.allclose([alpha, beta, gamma], euler)
