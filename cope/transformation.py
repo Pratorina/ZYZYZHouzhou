@@ -245,3 +245,63 @@ def translation_from_matrix(matrix):
 
 def reflection_matrix(point, normal):
     """Return matrix to mirror at plane defined by point and normal vector.
+
+    >>> v0 = numpy.random.random(4) - 0.5
+    >>> v0[3] = 1.
+    >>> v1 = numpy.random.random(3) - 0.5
+    >>> R = reflection_matrix(v0, v1)
+    >>> numpy.allclose(2, numpy.trace(R))
+    True
+    >>> numpy.allclose(v0, numpy.dot(R, v0))
+    True
+    >>> v2 = v0.copy()
+    >>> v2[:3] += v1
+    >>> v3 = v0.copy()
+    >>> v2[:3] -= v1
+    >>> numpy.allclose(v2, numpy.dot(R, v3))
+    True
+
+    """
+    normal = unit_vector(normal[:3])
+    M = numpy.identity(4)
+    M[:3, :3] -= 2.0 * numpy.outer(normal, normal)
+    M[:3, 3] = (2.0 * numpy.dot(point[:3], normal)) * normal
+    return M
+
+
+def reflection_from_matrix(matrix):
+    """Return mirror plane point and normal vector from reflection matrix.
+
+    >>> v0 = numpy.random.random(3) - 0.5
+    >>> v1 = numpy.random.random(3) - 0.5
+    >>> M0 = reflection_matrix(v0, v1)
+    >>> point, normal = reflection_from_matrix(M0)
+    >>> M1 = reflection_matrix(point, normal)
+    >>> is_same_transform(M0, M1)
+    True
+
+    """
+    M = numpy.array(matrix, dtype=numpy.float64, copy=False)
+    # normal: unit eigenvector corresponding to eigenvalue -1
+    w, V = numpy.linalg.eig(M[:3, :3])
+    i = numpy.where(abs(numpy.real(w) + 1.0) < 1e-8)[0]
+    if not len(i):
+        raise ValueError("no unit eigenvector corresponding to eigenvalue -1")
+    normal = numpy.real(V[:, i[0]]).squeeze()
+    # point: any unit eigenvector corresponding to eigenvalue 1
+    w, V = numpy.linalg.eig(M)
+    i = numpy.where(abs(numpy.real(w) - 1.0) < 1e-8)[0]
+    if not len(i):
+        raise ValueError("no unit eigenvector corresponding to eigenvalue 1")
+    point = numpy.real(V[:, i[-1]]).squeeze()
+    point /= point[3]
+    return point, normal
+
+
+def rotation_matrix(angle, direction, point=None):
+    """Return matrix to rotate about axis defined by point and direction.
+
+    >>> R = rotation_matrix(math.pi/2, [0, 0, 1], [1, 0, 0])
+    >>> numpy.allclose(numpy.dot(R, [0, 0, 0, 1]), [1, -1, 0, 1])
+    True
+    >>> angle = (random.random() - 0.5) * (2*math.pi)
