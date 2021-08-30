@@ -412,3 +412,51 @@ def scale_matrix(factor, origin=None, direction=None):
         M = numpy.identity(4)
         M[:3, :3] -= factor * numpy.outer(direction, direction)
         if origin is not None:
+            M[:3, 3] = (factor * numpy.dot(origin[:3], direction)) * direction
+    return M
+
+
+def scale_from_matrix(matrix):
+    """Return scaling factor, origin and direction from scaling matrix.
+
+    >>> factor = random.random() * 10 - 5
+    >>> origin = numpy.random.random(3) - 0.5
+    >>> direct = numpy.random.random(3) - 0.5
+    >>> S0 = scale_matrix(factor, origin)
+    >>> factor, origin, direction = scale_from_matrix(S0)
+    >>> S1 = scale_matrix(factor, origin, direction)
+    >>> is_same_transform(S0, S1)
+    True
+    >>> S0 = scale_matrix(factor, origin, direct)
+    >>> factor, origin, direction = scale_from_matrix(S0)
+    >>> S1 = scale_matrix(factor, origin, direction)
+    >>> is_same_transform(S0, S1)
+    True
+
+    """
+    M = numpy.array(matrix, dtype=numpy.float64, copy=False)
+    M33 = M[:3, :3]
+    factor = numpy.trace(M33) - 2.0
+    try:
+        # direction: unit eigenvector corresponding to eigenvalue factor
+        w, V = numpy.linalg.eig(M33)
+        i = numpy.where(abs(numpy.real(w) - factor) < 1e-8)[0][0]
+        direction = numpy.real(V[:, i]).squeeze()
+        direction /= vector_norm(direction)
+    except IndexError:
+        # uniform scaling
+        factor = (factor + 2.0) / 3.0
+        direction = None
+    # origin: any eigenvector corresponding to eigenvalue 1
+    w, V = numpy.linalg.eig(M)
+    i = numpy.where(abs(numpy.real(w) - 1.0) < 1e-8)[0]
+    if not len(i):
+        raise ValueError("no eigenvector corresponding to eigenvalue 1")
+    origin = numpy.real(V[:, i[-1]]).squeeze()
+    origin /= origin[3]
+    return factor, origin, direction
+
+
+def projection_matrix(point, normal, direction=None,
+                      perspective=None, pseudo=False):
+    """Return matrix to project onto plane defined by point and normal.
