@@ -460,3 +460,33 @@ def scale_from_matrix(matrix):
 def projection_matrix(point, normal, direction=None,
                       perspective=None, pseudo=False):
     """Return matrix to project onto plane defined by point and normal.
+
+    Using either perspective point, projection direction, or none of both.
+
+    If pseudo is True, perspective projections will preserve relative depth
+    such that Perspective = dot(Orthogonal, PseudoPerspective).
+
+    >>> P = projection_matrix([0, 0, 0], [1, 0, 0])
+    >>> numpy.allclose(P[1:, 1:], numpy.identity(4)[1:, 1:])
+    True
+    >>> point = numpy.random.random(3) - 0.5
+    >>> normal = numpy.random.random(3) - 0.5
+    >>> direct = numpy.random.random(3) - 0.5
+    >>> persp = numpy.random.random(3) - 0.5
+    >>> P0 = projection_matrix(point, normal)
+    >>> P1 = projection_matrix(point, normal, direction=direct)
+    >>> P2 = projection_matrix(point, normal, perspective=persp)
+    >>> P3 = projection_matrix(point, normal, perspective=persp, pseudo=True)
+    >>> is_same_transform(P2, numpy.dot(P0, P3))
+    True
+    >>> P = projection_matrix([3, 0, 0], [1, 1, 0], [1, 0, 0])
+    >>> v0 = (numpy.random.rand(4, 5) - 0.5) * 20
+    >>> v0[3] = 1
+    >>> v1 = numpy.dot(P, v0)
+    >>> numpy.allclose(v1[1], v0[1])
+    True
+    >>> numpy.allclose(v1[0], 3-v1[1])
+    True
+
+    """
+    M = numpy.identity(4)
