@@ -490,3 +490,56 @@ def projection_matrix(point, normal, direction=None,
 
     """
     M = numpy.identity(4)
+    point = numpy.array(point[:3], dtype=numpy.float64, copy=False)
+    normal = unit_vector(normal[:3])
+    if perspective is not None:
+        # perspective projection
+        perspective = numpy.array(perspective[:3], dtype=numpy.float64,
+                                  copy=False)
+        M[0, 0] = M[1, 1] = M[2, 2] = numpy.dot(perspective-point, normal)
+        M[:3, :3] -= numpy.outer(perspective, normal)
+        if pseudo:
+            # preserve relative depth
+            M[:3, :3] -= numpy.outer(normal, normal)
+            M[:3, 3] = numpy.dot(point, normal) * (perspective+normal)
+        else:
+            M[:3, 3] = numpy.dot(point, normal) * perspective
+        M[3, :3] = -normal
+        M[3, 3] = numpy.dot(perspective, normal)
+    elif direction is not None:
+        # parallel projection
+        direction = numpy.array(direction[:3], dtype=numpy.float64, copy=False)
+        scale = numpy.dot(direction, normal)
+        M[:3, :3] -= numpy.outer(direction, normal) / scale
+        M[:3, 3] = direction * (numpy.dot(point, normal) / scale)
+    else:
+        # orthogonal projection
+        M[:3, :3] -= numpy.outer(normal, normal)
+        M[:3, 3] = numpy.dot(point, normal) * normal
+    return M
+
+
+def projection_from_matrix(matrix, pseudo=False):
+    """Return projection plane and perspective point from projection matrix.
+
+    Return values are same as arguments for projection_matrix function:
+    point, normal, direction, perspective, and pseudo.
+
+    >>> point = numpy.random.random(3) - 0.5
+    >>> normal = numpy.random.random(3) - 0.5
+    >>> direct = numpy.random.random(3) - 0.5
+    >>> persp = numpy.random.random(3) - 0.5
+    >>> P0 = projection_matrix(point, normal)
+    >>> result = projection_from_matrix(P0)
+    >>> P1 = projection_matrix(*result)
+    >>> is_same_transform(P0, P1)
+    True
+    >>> P0 = projection_matrix(point, normal, direct)
+    >>> result = projection_from_matrix(P0)
+    >>> P1 = projection_matrix(*result)
+    >>> is_same_transform(P0, P1)
+    True
+    >>> P0 = projection_matrix(point, normal, perspective=persp, pseudo=False)
+    >>> result = projection_from_matrix(P0, pseudo=False)
+    >>> P1 = projection_matrix(*result)
+    >>> is_same_transform(P0, P1)
