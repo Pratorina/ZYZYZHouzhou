@@ -581,3 +581,43 @@ def projection_from_matrix(matrix, pseudo=False):
         # perspective projection
         i = numpy.where(abs(numpy.real(w)) > 1e-8)[0]
         if not len(i):
+            raise ValueError(
+                "no eigenvector not corresponding to eigenvalue 0")
+        point = numpy.real(V[:, i[-1]]).squeeze()
+        point /= point[3]
+        normal = - M[3, :3]
+        perspective = M[:3, 3] / numpy.dot(point[:3], normal)
+        if pseudo:
+            perspective -= normal
+        return point, normal, None, perspective, pseudo
+
+
+def clip_matrix(left, right, bottom, top, near, far, perspective=False):
+    """Return matrix to obtain normalized device coordinates from frustum.
+
+    The frustum bounds are axis-aligned along x (left, right),
+    y (bottom, top) and z (near, far).
+
+    Normalized device coordinates are in range [-1, 1] if coordinates are
+    inside the frustum.
+
+    If perspective is True the frustum is a truncated pyramid with the
+    perspective point at origin and direction along z axis, otherwise an
+    orthographic canonical view volume (a box).
+
+    Homogeneous coordinates transformed by the perspective clip matrix
+    need to be dehomogenized (divided by w coordinate).
+
+    >>> frustum = numpy.random.rand(6)
+    >>> frustum[1] += frustum[0]
+    >>> frustum[3] += frustum[2]
+    >>> frustum[5] += frustum[4]
+    >>> M = clip_matrix(perspective=False, *frustum)
+    >>> numpy.dot(M, [frustum[0], frustum[2], frustum[4], 1])
+    array([-1., -1., -1.,  1.])
+    >>> numpy.dot(M, [frustum[1], frustum[3], frustum[5], 1])
+    array([ 1.,  1.,  1.,  1.])
+    >>> M = clip_matrix(perspective=True, *frustum)
+    >>> v = numpy.dot(M, [frustum[0], frustum[2], frustum[4], 1])
+    >>> v / v[3]
+    array([-1., -1., -1.,  1.])
