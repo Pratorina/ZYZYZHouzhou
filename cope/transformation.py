@@ -543,3 +543,41 @@ def projection_from_matrix(matrix, pseudo=False):
     >>> result = projection_from_matrix(P0, pseudo=False)
     >>> P1 = projection_matrix(*result)
     >>> is_same_transform(P0, P1)
+    True
+    >>> P0 = projection_matrix(point, normal, perspective=persp, pseudo=True)
+    >>> result = projection_from_matrix(P0, pseudo=True)
+    >>> P1 = projection_matrix(*result)
+    >>> is_same_transform(P0, P1)
+    True
+
+    """
+    M = numpy.array(matrix, dtype=numpy.float64, copy=False)
+    M33 = M[:3, :3]
+    w, V = numpy.linalg.eig(M)
+    i = numpy.where(abs(numpy.real(w) - 1.0) < 1e-8)[0]
+    if not pseudo and len(i):
+        # point: any eigenvector corresponding to eigenvalue 1
+        point = numpy.real(V[:, i[-1]]).squeeze()
+        point /= point[3]
+        # direction: unit eigenvector corresponding to eigenvalue 0
+        w, V = numpy.linalg.eig(M33)
+        i = numpy.where(abs(numpy.real(w)) < 1e-8)[0]
+        if not len(i):
+            raise ValueError("no eigenvector corresponding to eigenvalue 0")
+        direction = numpy.real(V[:, i[0]]).squeeze()
+        direction /= vector_norm(direction)
+        # normal: unit eigenvector of M33.T corresponding to eigenvalue 0
+        w, V = numpy.linalg.eig(M33.T)
+        i = numpy.where(abs(numpy.real(w)) < 1e-8)[0]
+        if len(i):
+            # parallel projection
+            normal = numpy.real(V[:, i[0]]).squeeze()
+            normal /= vector_norm(normal)
+            return point, normal, direction, None, False
+        else:
+            # orthogonal projection, where normal equals direction vector
+            return point, direction, None, None, False
+    else:
+        # perspective projection
+        i = numpy.where(abs(numpy.real(w)) > 1e-8)[0]
+        if not len(i):
