@@ -621,3 +621,43 @@ def clip_matrix(left, right, bottom, top, near, far, perspective=False):
     >>> v = numpy.dot(M, [frustum[0], frustum[2], frustum[4], 1])
     >>> v / v[3]
     array([-1., -1., -1.,  1.])
+    >>> v = numpy.dot(M, [frustum[1], frustum[3], frustum[4], 1])
+    >>> v / v[3]
+    array([ 1.,  1., -1.,  1.])
+
+    """
+    if left >= right or bottom >= top or near >= far:
+        raise ValueError("invalid frustum")
+    if perspective:
+        if near <= _EPS:
+            raise ValueError("invalid frustum: near <= 0")
+        t = 2.0 * near
+        M = [[t/(left-right), 0.0, (right+left)/(right-left), 0.0],
+             [0.0, t/(bottom-top), (top+bottom)/(top-bottom), 0.0],
+             [0.0, 0.0, (far+near)/(near-far), t*far/(far-near)],
+             [0.0, 0.0, -1.0, 0.0]]
+    else:
+        M = [[2.0/(right-left), 0.0, 0.0, (right+left)/(left-right)],
+             [0.0, 2.0/(top-bottom), 0.0, (top+bottom)/(bottom-top)],
+             [0.0, 0.0, 2.0/(far-near), (far+near)/(near-far)],
+             [0.0, 0.0, 0.0, 1.0]]
+    return numpy.array(M)
+
+
+def shear_matrix(angle, direction, point, normal):
+    """Return matrix to shear by angle along direction vector on shear plane.
+
+    The shear plane is defined by a point and normal vector. The direction
+    vector must be orthogonal to the plane's normal vector.
+
+    A point P is transformed by the shear matrix into P" such that
+    the vector P-P" is parallel to the direction vector and its extent is
+    given by the angle of P-P'-P", where P' is the orthogonal projection
+    of P onto the shear plane.
+
+    >>> angle = (random.random() - 0.5) * 4*math.pi
+    >>> direct = numpy.random.random(3) - 0.5
+    >>> point = numpy.random.random(3) - 0.5
+    >>> normal = numpy.cross(direct, numpy.random.random(3))
+    >>> S = shear_matrix(angle, direct, point, normal)
+    >>> numpy.allclose(1, numpy.linalg.det(S))
