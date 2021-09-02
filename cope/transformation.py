@@ -661,3 +661,52 @@ def shear_matrix(angle, direction, point, normal):
     >>> normal = numpy.cross(direct, numpy.random.random(3))
     >>> S = shear_matrix(angle, direct, point, normal)
     >>> numpy.allclose(1, numpy.linalg.det(S))
+    True
+
+    """
+    normal = unit_vector(normal[:3])
+    direction = unit_vector(direction[:3])
+    if abs(numpy.dot(normal, direction)) > 1e-6:
+        raise ValueError("direction and normal vectors are not orthogonal")
+    angle = math.tan(angle)
+    M = numpy.identity(4)
+    M[:3, :3] += angle * numpy.outer(direction, normal)
+    M[:3, 3] = -angle * numpy.dot(point[:3], normal) * direction
+    return M
+
+
+def shear_from_matrix(matrix):
+    """Return shear angle, direction and plane from shear matrix.
+
+    >>> angle = (random.random() - 0.5) * 4*math.pi
+    >>> direct = numpy.random.random(3) - 0.5
+    >>> point = numpy.random.random(3) - 0.5
+    >>> normal = numpy.cross(direct, numpy.random.random(3))
+    >>> S0 = shear_matrix(angle, direct, point, normal)
+    >>> angle, direct, point, normal = shear_from_matrix(S0)
+    >>> S1 = shear_matrix(angle, direct, point, normal)
+    >>> is_same_transform(S0, S1)
+    True
+
+    """
+    M = numpy.array(matrix, dtype=numpy.float64, copy=False)
+    M33 = M[:3, :3]
+    # normal: cross independent eigenvectors corresponding to the eigenvalue 1
+    w, V = numpy.linalg.eig(M33)
+    i = numpy.where(abs(numpy.real(w) - 1.0) < 1e-4)[0]
+    if len(i) < 2:
+        raise ValueError("no two linear independent eigenvectors found %s" % w)
+    V = numpy.real(V[:, i]).squeeze().T
+    lenorm = -1.0
+    for i0, i1 in ((0, 1), (0, 2), (1, 2)):
+        n = numpy.cross(V[i0], V[i1])
+        w = vector_norm(n)
+        if w > lenorm:
+            lenorm = w
+            normal = n
+    normal /= lenorm
+    # direction and angle
+    direction = numpy.dot(M33 - numpy.identity(3), normal)
+    angle = vector_norm(direction)
+    direction /= angle
+    angle = math.atan(angle)
