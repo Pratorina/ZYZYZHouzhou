@@ -932,3 +932,37 @@ def affine_matrix_from_points(v0, v1, shear=True, scale=True, usesvd=True):
     ndims = v0.shape[0]
     if ndims < 2 or v0.shape[1] < ndims or v0.shape != v1.shape:
         raise ValueError("input arrays are of wrong shape or type")
+
+    # move centroids to origin
+    t0 = -numpy.mean(v0, axis=1)
+    M0 = numpy.identity(ndims+1)
+    M0[:ndims, ndims] = t0
+    v0 += t0.reshape(ndims, 1)
+    t1 = -numpy.mean(v1, axis=1)
+    M1 = numpy.identity(ndims+1)
+    M1[:ndims, ndims] = t1
+    v1 += t1.reshape(ndims, 1)
+
+    if shear:
+        # Affine transformation
+        A = numpy.concatenate((v0, v1), axis=0)
+        u, s, vh = numpy.linalg.svd(A.T)
+        vh = vh[:ndims].T
+        B = vh[:ndims]
+        C = vh[ndims:2*ndims]
+        t = numpy.dot(C, numpy.linalg.pinv(B))
+        t = numpy.concatenate((t, numpy.zeros((ndims, 1))), axis=1)
+        M = numpy.vstack((t, ((0.0,)*ndims) + (1.0,)))
+    elif usesvd or ndims != 3:
+        # Rigid transformation via SVD of covariance matrix
+        u, s, vh = numpy.linalg.svd(numpy.dot(v1, v0.T))
+        # rotation matrix from SVD orthonormal bases
+        R = numpy.dot(u, vh)
+        if numpy.linalg.det(R) < 0.0:
+            # R does not constitute right handed system
+            R -= numpy.outer(u[:, ndims-1], vh[ndims-1, :]*2.0)
+            s[-1] *= -1.0
+        # homogeneous transformation matrix
+        M = numpy.identity(ndims+1)
+        M[:ndims, :ndims] = R
+    else:
