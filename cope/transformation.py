@@ -1015,3 +1015,52 @@ def superimposition_matrix(v0, v1, scale=False, usesvd=True):
     >>> M = superimposition_matrix(v0, v1)
     >>> numpy.allclose(v1, numpy.dot(M, v0))
     True
+    >>> v0 = (numpy.random.rand(4, 100) - 0.5) * 20
+    >>> v0[3] = 1
+    >>> v1 = numpy.dot(R, v0)
+    >>> M = superimposition_matrix(v0, v1)
+    >>> numpy.allclose(v1, numpy.dot(M, v0))
+    True
+    >>> S = scale_matrix(random.random())
+    >>> T = translation_matrix(numpy.random.random(3)-0.5)
+    >>> M = concatenate_matrices(T, R, S)
+    >>> v1 = numpy.dot(M, v0)
+    >>> v0[:3] += numpy.random.normal(0, 1e-9, 300).reshape(3, -1)
+    >>> M = superimposition_matrix(v0, v1, scale=True)
+    >>> numpy.allclose(v1, numpy.dot(M, v0))
+    True
+    >>> M = superimposition_matrix(v0, v1, scale=True, usesvd=False)
+    >>> numpy.allclose(v1, numpy.dot(M, v0))
+    True
+    >>> v = numpy.empty((4, 100, 3))
+    >>> v[:, :, 0] = v0
+    >>> M = superimposition_matrix(v0, v1, scale=True, usesvd=False)
+    >>> numpy.allclose(v1, numpy.dot(M, v[:, :, 0]))
+    True
+
+    """
+    v0 = numpy.array(v0, dtype=numpy.float64, copy=False)[:3]
+    v1 = numpy.array(v1, dtype=numpy.float64, copy=False)[:3]
+    return affine_matrix_from_points(v0, v1, shear=False,
+                                     scale=scale, usesvd=usesvd)
+
+
+def euler_matrix(ai, aj, ak, axes='sxyz'):
+    """Return homogeneous rotation matrix from Euler angles and axis sequence.
+
+    ai, aj, ak : Euler's roll, pitch and yaw angles
+    axes : One of 24 axis sequences as string or encoded tuple
+
+    >>> R = euler_matrix(1, 2, 3, 'syxz')
+    >>> numpy.allclose(numpy.sum(R[0]), -1.34786452)
+    True
+    >>> R = euler_matrix(1, 2, 3, (0, 1, 0, 1))
+    >>> numpy.allclose(numpy.sum(R[0]), -0.383436184)
+    True
+    >>> ai, aj, ak = (4*math.pi) * (numpy.random.random(3) - 0.5)
+    >>> for axes in _AXES2TUPLE.keys():
+    ...    R = euler_matrix(ai, aj, ak, axes)
+    >>> for axes in _TUPLE2AXES.keys():
+    ...    R = euler_matrix(ai, aj, ak, axes)
+
+    """
