@@ -966,3 +966,52 @@ def affine_matrix_from_points(v0, v1, shear=True, scale=True, usesvd=True):
         M = numpy.identity(ndims+1)
         M[:ndims, :ndims] = R
     else:
+        # Rigid transformation matrix via quaternion
+        # compute symmetric matrix N
+        xx, yy, zz = numpy.sum(v0 * v1, axis=1)
+        xy, yz, zx = numpy.sum(v0 * numpy.roll(v1, -1, axis=0), axis=1)
+        xz, yx, zy = numpy.sum(v0 * numpy.roll(v1, -2, axis=0), axis=1)
+        N = [[xx+yy+zz, 0.0,      0.0,      0.0],
+             [yz-zy,    xx-yy-zz, 0.0,      0.0],
+             [zx-xz,    xy+yx,    yy-xx-zz, 0.0],
+             [xy-yx,    zx+xz,    yz+zy,    zz-xx-yy]]
+        # quaternion: eigenvector corresponding to most positive eigenvalue
+        w, V = numpy.linalg.eigh(N)
+        q = V[:, numpy.argmax(w)]
+        q /= vector_norm(q)  # unit quaternion
+        # homogeneous transformation matrix
+        M = quaternion_matrix(q)
+
+    if scale and not shear:
+        # Affine transformation; scale is ratio of RMS deviations from centroid
+        v0 *= v0
+        v1 *= v1
+        M[:ndims, :ndims] *= math.sqrt(numpy.sum(v1) / numpy.sum(v0))
+
+    # move centroids back
+    M = numpy.dot(numpy.linalg.inv(M1), numpy.dot(M, M0))
+    M /= M[ndims, ndims]
+    return M
+
+
+def superimposition_matrix(v0, v1, scale=False, usesvd=True):
+    """Return matrix to transform given 3D point set into second point set.
+
+    v0 and v1 are shape (3, \*) or (4, \*) arrays of at least 3 points.
+
+    The parameters scale and usesvd are explained in the more general
+    affine_matrix_from_points function.
+
+    The returned matrix is a similarity or Euclidean transformation matrix.
+    This function has a fast C implementation in transformations.c.
+
+    >>> v0 = numpy.random.rand(3, 10)
+    >>> M = superimposition_matrix(v0, v0)
+    >>> numpy.allclose(M, numpy.identity(4))
+    True
+    >>> R = random_rotation_matrix(numpy.random.random(3))
+    >>> v0 = [[1,0,0], [0,1,0], [0,0,1], [1,1,1]]
+    >>> v1 = numpy.dot(R, v0)
+    >>> M = superimposition_matrix(v0, v1)
+    >>> numpy.allclose(v1, numpy.dot(M, v0))
+    True
