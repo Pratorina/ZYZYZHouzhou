@@ -1064,3 +1064,38 @@ def euler_matrix(ai, aj, ak, axes='sxyz'):
     ...    R = euler_matrix(ai, aj, ak, axes)
 
     """
+    try:
+        firstaxis, parity, repetition, frame = _AXES2TUPLE[axes]
+    except (AttributeError, KeyError):
+        _TUPLE2AXES[axes]  # validation
+        firstaxis, parity, repetition, frame = axes
+
+    i = firstaxis
+    j = _NEXT_AXIS[i+parity]
+    k = _NEXT_AXIS[i-parity+1]
+
+    if frame:
+        ai, ak = ak, ai
+    if parity:
+        ai, aj, ak = -ai, -aj, -ak
+
+    si, sj, sk = math.sin(ai), math.sin(aj), math.sin(ak)
+    ci, cj, ck = math.cos(ai), math.cos(aj), math.cos(ak)
+    cc, cs = ci*ck, ci*sk
+    sc, ss = si*ck, si*sk
+
+    M = numpy.identity(4)
+    if repetition:
+        M[i, i] = cj
+        M[i, j] = sj*si
+        M[i, k] = sj*ci
+        M[j, i] = sj*sk
+        M[j, j] = -cj*ss+cc
+        M[j, k] = -cj*cs-sc
+        M[k, i] = -sj*ck
+        M[k, j] = cj*sc+cs
+        M[k, k] = cj*cc-ss
+    else:
+        M[i, i] = cj*ck
+        M[i, j] = sj*sc-cs
+        M[i, k] = sj*cc+ss
