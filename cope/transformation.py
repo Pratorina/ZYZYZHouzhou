@@ -1223,3 +1223,56 @@ def quaternion_from_euler(ai, aj, ak, axes='sxyz'):
         q[i] = cj*(cs + sc)
         q[j] = sj*(cc + ss)
         q[k] = sj*(cs - sc)
+    else:
+        q[0] = cj*cc + sj*ss
+        q[i] = cj*sc - sj*cs
+        q[j] = cj*ss + sj*cc
+        q[k] = cj*cs - sj*sc
+    if parity:
+        q[j] *= -1.0
+
+    return q
+
+
+def quaternion_about_axis(angle, axis):
+    """Return quaternion for rotation about axis.
+
+    >>> q = quaternion_about_axis(0.123, [1, 0, 0])
+    >>> numpy.allclose(q, [0.99810947, 0.06146124, 0, 0])
+    True
+
+    """
+    q = numpy.array([0.0, axis[0], axis[1], axis[2]])
+    qlen = vector_norm(q)
+    if qlen > _EPS:
+        q *= math.sin(angle/2.0) / qlen
+    q[0] = math.cos(angle/2.0)
+    return q
+
+
+def quaternion_matrix(quaternion):
+    """Return homogeneous rotation matrix from quaternion.
+
+    >>> M = quaternion_matrix([0.99810947, 0.06146124, 0, 0])
+    >>> numpy.allclose(M, rotation_matrix(0.123, [1, 0, 0]))
+    True
+    >>> M = quaternion_matrix([1, 0, 0, 0])
+    >>> numpy.allclose(M, numpy.identity(4))
+    True
+    >>> M = quaternion_matrix([0, 1, 0, 0])
+    >>> numpy.allclose(M, numpy.diag([1, -1, -1, 1]))
+    True
+
+    """
+    q = numpy.array(quaternion, dtype=numpy.float64, copy=True)
+    n = numpy.dot(q, q)
+    if n < _EPS:
+        return numpy.identity(4)
+    q *= math.sqrt(2.0 / n)
+    q = numpy.outer(q, q)
+    return numpy.array([
+        [1.0-q[2, 2]-q[3, 3],     q[1, 2]-q[3, 0],     q[1, 3]+q[2, 0], 0.0],
+        [    q[1, 2]+q[3, 0], 1.0-q[1, 1]-q[3, 3],     q[2, 3]-q[1, 0], 0.0],
+        [    q[1, 3]-q[2, 0],     q[2, 3]+q[1, 0], 1.0-q[1, 1]-q[2, 2], 0.0],
+        [                0.0,                 0.0,                 0.0, 1.0]])
+
