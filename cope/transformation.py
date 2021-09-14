@@ -1276,3 +1276,51 @@ def quaternion_matrix(quaternion):
         [    q[1, 3]-q[2, 0],     q[2, 3]+q[1, 0], 1.0-q[1, 1]-q[2, 2], 0.0],
         [                0.0,                 0.0,                 0.0, 1.0]])
 
+
+def quaternion_from_matrix(matrix, isprecise=False):
+    """Return quaternion from rotation matrix.
+
+    If isprecise is True, the input matrix is assumed to be a precise rotation
+    matrix and a faster algorithm is used.
+
+    >>> q = quaternion_from_matrix(numpy.identity(4), True)
+    >>> numpy.allclose(q, [1, 0, 0, 0])
+    True
+    >>> q = quaternion_from_matrix(numpy.diag([1, -1, -1, 1]))
+    >>> numpy.allclose(q, [0, 1, 0, 0]) or numpy.allclose(q, [0, -1, 0, 0])
+    True
+    >>> R = rotation_matrix(0.123, (1, 2, 3))
+    >>> q = quaternion_from_matrix(R, True)
+    >>> numpy.allclose(q, [0.9981095, 0.0164262, 0.0328524, 0.0492786])
+    True
+    >>> R = [[-0.545, 0.797, 0.260, 0], [0.733, 0.603, -0.313, 0],
+    ...      [-0.407, 0.021, -0.913, 0], [0, 0, 0, 1]]
+    >>> q = quaternion_from_matrix(R)
+    >>> numpy.allclose(q, [0.19069, 0.43736, 0.87485, -0.083611])
+    True
+    >>> R = [[0.395, 0.362, 0.843, 0], [-0.626, 0.796, -0.056, 0],
+    ...      [-0.677, -0.498, 0.529, 0], [0, 0, 0, 1]]
+    >>> q = quaternion_from_matrix(R)
+    >>> numpy.allclose(q, [0.82336615, -0.13610694, 0.46344705, -0.29792603])
+    True
+    >>> R = random_rotation_matrix()
+    >>> q = quaternion_from_matrix(R)
+    >>> is_same_transform(R, quaternion_matrix(q))
+    True
+    >>> R = euler_matrix(0.0, 0.0, numpy.pi/2.0)
+    >>> numpy.allclose(quaternion_from_matrix(R, isprecise=False),
+    ...                quaternion_from_matrix(R, isprecise=True))
+    True
+
+    """
+    M = numpy.array(matrix, dtype=numpy.float64, copy=False)[:4, :4]
+    if isprecise:
+        q = numpy.empty((4, ))
+        t = numpy.trace(M)
+        if t > M[3, 3]:
+            q[0] = t
+            q[3] = M[1, 0] - M[0, 1]
+            q[2] = M[0, 2] - M[2, 0]
+            q[1] = M[2, 1] - M[1, 2]
+        else:
+            i, j, k = 1, 2, 3
