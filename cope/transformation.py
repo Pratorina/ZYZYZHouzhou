@@ -1364,3 +1364,38 @@ def quaternion_multiply(quaternion1, quaternion0):
     >>> q = quaternion_multiply([4, 1, -2, 3], [8, -5, 6, 7])
     >>> numpy.allclose(q, [28, -44, -14, 48])
     True
+
+    """
+    w0, x0, y0, z0 = quaternion0
+    w1, x1, y1, z1 = quaternion1
+    return numpy.array([-x1*x0 - y1*y0 - z1*z0 + w1*w0,
+                         x1*w0 + y1*z0 - z1*y0 + w1*x0,
+                        -x1*z0 + y1*w0 + z1*x0 + w1*y0,
+                         x1*y0 - y1*x0 + z1*w0 + w1*z0], dtype=numpy.float64)
+
+
+def quaternion_conjugate(quaternion):
+    """Return conjugate of quaternion.
+
+    >>> q0 = random_quaternion()
+    >>> q1 = quaternion_conjugate(q0)
+    >>> q1[0] == q0[0] and all(q1[1:] == -q0[1:])
+    True
+
+    """
+    q = numpy.array(quaternion, dtype=numpy.float64, copy=True)
+    numpy.negative(q[1:], q[1:])
+    return q
+
+
+def quaternion_inverse(quaternion):
+    """Return inverse of quaternion.
+
+    >>> q0 = random_quaternion()
+    >>> q1 = quaternion_inverse(q0)
+    >>> numpy.allclose(quaternion_multiply(q0, q1), [1, 0, 0, 0])
+    True
+
+    """
+    q = numpy.array(quaternion, dtype=numpy.float64, copy=True)
+    numpy.negative(q[1:], q[1:])
