@@ -1445,3 +1445,46 @@ def quaternion_slerp(quat0, quat1, fraction, spin=0, shortestpath=True):
     if fraction == 0.0:
         return q0
     elif fraction == 1.0:
+        return q1
+    d = numpy.dot(q0, q1)
+    if abs(abs(d) - 1.0) < _EPS:
+        return q0
+    if shortestpath and d < 0.0:
+        # invert rotation
+        d = -d
+        numpy.negative(q1, q1)
+    angle = math.acos(d) + spin * math.pi
+    if abs(angle) < _EPS:
+        return q0
+    isin = 1.0 / math.sin(angle)
+    q0 *= math.sin((1.0 - fraction) * angle) * isin
+    q1 *= math.sin(fraction * angle) * isin
+    q0 += q1
+    return q0
+
+
+def random_quaternion(rand=None):
+    """Return uniform random unit quaternion.
+
+    rand: array like or None
+        Three independent random variables that are uniformly distributed
+        between 0 and 1.
+
+    >>> q = random_quaternion()
+    >>> numpy.allclose(1, vector_norm(q))
+    True
+    >>> q = random_quaternion(numpy.random.random(3))
+    >>> len(q.shape), q.shape[0]==4
+    (1, True)
+
+    """
+    if rand is None:
+        rand = numpy.random.rand(3)
+    else:
+        assert len(rand) == 3
+    r1 = numpy.sqrt(1.0 - rand[0])
+    r2 = numpy.sqrt(rand[0])
+    pi2 = math.pi * 2.0
+    t1 = pi2 * rand[1]
+    t2 = pi2 * rand[2]
+    return numpy.array([numpy.cos(t2)*r2, numpy.sin(t1)*r1,
