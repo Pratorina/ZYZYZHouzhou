@@ -1488,3 +1488,57 @@ def random_quaternion(rand=None):
     t1 = pi2 * rand[1]
     t2 = pi2 * rand[2]
     return numpy.array([numpy.cos(t2)*r2, numpy.sin(t1)*r1,
+                        numpy.cos(t1)*r1, numpy.sin(t2)*r2])
+
+
+def random_rotation_matrix(rand=None):
+    """Return uniform random rotation matrix.
+
+    rand: array like
+        Three independent random variables that are uniformly distributed
+        between 0 and 1 for each returned quaternion.
+
+    >>> R = random_rotation_matrix()
+    >>> numpy.allclose(numpy.dot(R.T, R), numpy.identity(4))
+    True
+
+    """
+    return quaternion_matrix(random_quaternion(rand))
+
+
+class Arcball(object):
+    """Virtual Trackball Control.
+
+    >>> ball = Arcball()
+    >>> ball = Arcball(initial=numpy.identity(4))
+    >>> ball.place([320, 320], 320)
+    >>> ball.down([500, 250])
+    >>> ball.drag([475, 275])
+    >>> R = ball.matrix()
+    >>> numpy.allclose(numpy.sum(R), 3.90583455)
+    True
+    >>> ball = Arcball(initial=[1, 0, 0, 0])
+    >>> ball.place([320, 320], 320)
+    >>> ball.setaxes([1, 1, 0], [-1, 1, 0])
+    >>> ball.constrain = True
+    >>> ball.down([400, 200])
+    >>> ball.drag([200, 400])
+    >>> R = ball.matrix()
+    >>> numpy.allclose(numpy.sum(R), 0.2055924)
+    True
+    >>> ball.next()
+
+    """
+    def __init__(self, initial=None):
+        """Initialize virtual trackball control.
+
+        initial : quaternion or rotation matrix
+
+        """
+        self._axis = None
+        self._axes = None
+        self._radius = 1.0
+        self._center = [0.0, 0.0]
+        self._vdown = numpy.array([0.0, 0.0, 1.0])
+        self._constrain = False
+        if initial is None:
