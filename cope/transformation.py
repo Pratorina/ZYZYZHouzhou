@@ -1586,3 +1586,55 @@ class Arcball(object):
 
     def down(self, point):
         """Set initial cursor window coordinates and pick constrain-axis."""
+        self._vdown = arcball_map_to_sphere(point, self._center, self._radius)
+        self._qdown = self._qpre = self._qnow
+        if self._constrain and self._axes is not None:
+            self._axis = arcball_nearest_axis(self._vdown, self._axes)
+            self._vdown = arcball_constrain_to_axis(self._vdown, self._axis)
+        else:
+            self._axis = None
+
+    def drag(self, point):
+        """Update current cursor window coordinates."""
+        vnow = arcball_map_to_sphere(point, self._center, self._radius)
+        if self._axis is not None:
+            vnow = arcball_constrain_to_axis(vnow, self._axis)
+        self._qpre = self._qnow
+        t = numpy.cross(self._vdown, vnow)
+        if numpy.dot(t, t) < _EPS:
+            self._qnow = self._qdown
+        else:
+            q = [numpy.dot(self._vdown, vnow), t[0], t[1], t[2]]
+            self._qnow = quaternion_multiply(q, self._qdown)
+
+    def next(self, acceleration=0.0):
+        """Continue rotation in direction of last drag."""
+        q = quaternion_slerp(self._qpre, self._qnow, 2.0+acceleration, False)
+        self._qpre, self._qnow = self._qnow, q
+
+    def matrix(self):
+        """Return homogeneous rotation matrix."""
+        return quaternion_matrix(self._qnow)
+
+
+def arcball_map_to_sphere(point, center, radius):
+    """Return unit sphere coordinates from window coordinates."""
+    v0 = (point[0] - center[0]) / radius
+    v1 = (center[1] - point[1]) / radius
+    n = v0*v0 + v1*v1
+    if n > 1.0:
+        # position outside of sphere
+        n = math.sqrt(n)
+        return numpy.array([v0/n, v1/n, 0.0])
+    else:
+        return numpy.array([v0, v1, math.sqrt(1.0 - n)])
+
+
+def arcball_constrain_to_axis(point, axis):
+    """Return sphere point perpendicular to axis."""
+    v = numpy.array(point, dtype=numpy.float64, copy=True)
+    a = numpy.array(axis, dtype=numpy.float64, copy=True)
+    v -= a * numpy.dot(a, v)  # on plane
+    n = vector_norm(v)
+    if n > _EPS:
+        if v[2] < 0.0:
