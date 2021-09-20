@@ -1638,3 +1638,42 @@ def arcball_constrain_to_axis(point, axis):
     n = vector_norm(v)
     if n > _EPS:
         if v[2] < 0.0:
+            numpy.negative(v, v)
+        v /= n
+        return v
+    if a[2] == 1.0:
+        return numpy.array([1.0, 0.0, 0.0])
+    return unit_vector([-a[1], a[0], 0.0])
+
+
+def arcball_nearest_axis(point, axes):
+    """Return axis, which arc is nearest to point."""
+    point = numpy.array(point, dtype=numpy.float64, copy=False)
+    nearest = None
+    mx = -1.0
+    for axis in axes:
+        t = numpy.dot(arcball_constrain_to_axis(point, axis), point)
+        if t > mx:
+            nearest = axis
+            mx = t
+    return nearest
+
+
+# epsilon for testing whether a number is close to zero
+_EPS = numpy.finfo(float).eps * 4.0
+
+# axis sequences for Euler angles
+_NEXT_AXIS = [1, 2, 0, 1]
+
+# map axes strings to/from tuples of inner axis, parity, repetition, frame
+_AXES2TUPLE = {
+    'sxyz': (0, 0, 0, 0), 'sxyx': (0, 0, 1, 0), 'sxzy': (0, 1, 0, 0),
+    'sxzx': (0, 1, 1, 0), 'syzx': (1, 0, 0, 0), 'syzy': (1, 0, 1, 0),
+    'syxz': (1, 1, 0, 0), 'syxy': (1, 1, 1, 0), 'szxy': (2, 0, 0, 0),
+    'szxz': (2, 0, 1, 0), 'szyx': (2, 1, 0, 0), 'szyz': (2, 1, 1, 0),
+    'rzyx': (0, 0, 0, 1), 'rxyx': (0, 0, 1, 1), 'ryzx': (0, 1, 0, 1),
+    'rxzx': (0, 1, 1, 1), 'rxzy': (1, 0, 0, 1), 'ryzy': (1, 0, 1, 1),
+    'rzxy': (1, 1, 0, 1), 'ryxy': (1, 1, 1, 1), 'ryxz': (2, 0, 0, 1),
+    'rzxz': (2, 0, 1, 1), 'rxyz': (2, 1, 0, 1), 'rzyz': (2, 1, 1, 1)}
+
+_TUPLE2AXES = dict((v, k) for k, v in _AXES2TUPLE.items())
