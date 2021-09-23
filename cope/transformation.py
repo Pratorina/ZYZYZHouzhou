@@ -1766,3 +1766,48 @@ def random_vector(size):
     """Return array of random doubles in the half-open interval [0.0, 1.0).
 
     >>> v = random_vector(10000)
+    >>> numpy.all(v >= 0) and numpy.all(v < 1)
+    True
+    >>> v0 = random_vector(10)
+    >>> v1 = random_vector(10)
+    >>> numpy.any(v0 == v1)
+    False
+
+    """
+    return numpy.random.random(size)
+
+
+def vector_product(v0, v1, axis=0):
+    """Return vector perpendicular to vectors.
+
+    >>> v = vector_product([2, 0, 0], [0, 3, 0])
+    >>> numpy.allclose(v, [0, 0, 6])
+    True
+    >>> v0 = [[2, 0, 0, 2], [0, 2, 0, 2], [0, 0, 2, 2]]
+    >>> v1 = [[3], [0], [0]]
+    >>> v = vector_product(v0, v1)
+    >>> numpy.allclose(v, [[0, 0, 0, 0], [0, 0, 6, 6], [0, -6, 0, -6]])
+    True
+    >>> v0 = [[2, 0, 0], [2, 0, 0], [0, 2, 0], [2, 0, 0]]
+    >>> v1 = [[0, 3, 0], [0, 0, 3], [0, 0, 3], [3, 3, 3]]
+    >>> v = vector_product(v0, v1, axis=1)
+    >>> numpy.allclose(v, [[0, 0, 6], [0, -6, 0], [6, 0, 0], [0, -6, 6]])
+    True
+
+    """
+    return numpy.cross(v0, v1, axis=axis)
+
+
+def angle_between_vectors(v0, v1, directed=True, axis=0):
+    """Return angle between vectors.
+
+    If directed is False, the input vectors are interpreted as undirected axes,
+    i.e. the maximum angle is pi/2.
+
+    >>> a = angle_between_vectors([1, -2, 3], [-1, 2, -3])
+    >>> numpy.allclose(a, math.pi)
+    True
+    >>> a = angle_between_vectors([1, -2, 3], [-1, 2, -3], directed=False)
+    >>> numpy.allclose(a, 0)
+    True
+    >>> v0 = [[2, 0, 0, 2], [0, 2, 0, 2], [0, 0, 2, 2]]
