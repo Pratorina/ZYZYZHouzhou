@@ -1852,3 +1852,48 @@ def concatenate_matrices(*matrices):
     >>> numpy.allclose(M, concatenate_matrices(M))
     True
     >>> numpy.allclose(numpy.dot(M, M.T), concatenate_matrices(M, M.T))
+    True
+
+    """
+    M = numpy.identity(4)
+    for i in matrices:
+        M = numpy.dot(M, i)
+    return M
+
+
+def is_same_transform(matrix0, matrix1):
+    """Return True if two matrices perform same transformation.
+
+    >>> is_same_transform(numpy.identity(4), numpy.identity(4))
+    True
+    >>> is_same_transform(numpy.identity(4), random_rotation_matrix())
+    False
+
+    """
+    matrix0 = numpy.array(matrix0, dtype=numpy.float64, copy=True)
+    matrix0 /= matrix0[3, 3]
+    matrix1 = numpy.array(matrix1, dtype=numpy.float64, copy=True)
+    matrix1 /= matrix1[3, 3]
+    return numpy.allclose(matrix0, matrix1)
+
+
+def _import_module(name, package=None, warn=True, prefix='_py_', ignore='_'):
+    """Try import all public attributes from module into global namespace.
+
+    Existing attributes with name clashes are renamed with prefix.
+    Attributes starting with underscore are ignored by default.
+
+    Return True on successful import.
+
+    """
+    import warnings
+    from importlib import import_module
+    try:
+        if not package:
+            module = import_module(name)
+        else:
+            module = import_module('.' + name, package=package)
+    except ImportError:
+        if warn:
+            warnings.warn("failed to import module %s" % name)
+    else:
