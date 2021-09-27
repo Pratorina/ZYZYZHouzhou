@@ -1897,3 +1897,19 @@ def _import_module(name, package=None, warn=True, prefix='_py_', ignore='_'):
         if warn:
             warnings.warn("failed to import module %s" % name)
     else:
+        for attr in dir(module):
+            if ignore and attr.startswith(ignore):
+                continue
+            if prefix:
+                if attr in globals():
+                    globals()[prefix + attr] = globals()[attr]
+                elif warn:
+                    warnings.warn("no Python implementation of " + attr)
+            globals()[attr] = getattr(module, attr)
+        return True
+
+if __name__ == "__main__":
+    import doctest
+    import random  # used in doctests
+    numpy.set_printoptions(suppress=True, precision=5)
+    doctest.testmod()
