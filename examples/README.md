@@ -61,3 +61,23 @@ sigmaRb = np.array([[  4.15625435e-05,  -2.88693145e-05,  -6.06526440e-06],
                     [ -6.06526440e-06,  -1.44817304e-06,   1.43937081e-05]])
 sigmatb = np.array([[  1.95293655e-04,   2.12627214e-05,  -1.06674886e-05],
                     [  2.12627214e-05,   4.44314426e-05,   3.86787591e-06],
+                    [ -1.06674886e-05,   3.86787591e-06,   2.13069579e-05]])
+```
+
+Finally, solve with `cope` 
+```python
+Rxinit,txinit = axxb.FCParkSolution(alpha,beta,ta,tb) # Initial guess
+Rxhat, sigmaRx, rot_converged = axxb.IterativeSolutionRot(beta,alpha,sigmaRa,sigmaRb,Rxinit)
+txhat, sigmatx, trans_converged = axxb.IterativeSolutionTrans(beta, alpha, ta, tb, Rxhat, sigmaRa, sigmaRb, sigmata, sigmatb, sigmaRx, txinit.reshape((3,1)), 10)
+# Visualization
+axxb.VisualizeCovariances(sigmaRx,sigmatx,-0.01*0.75,0.01*0.75,-0.01*0.75,0.01*0.75)
+plt.show(True)
+```
+This figure should appear!It shows the projections of the one-standard-deviation covariance ellipsoids.
+
+<p align="center">
+  <img src="medias/axxb.png" width="400"/>
+</p>
+
+For more examples, please see the /examples folder
+-->
