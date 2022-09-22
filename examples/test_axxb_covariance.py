@@ -3,4 +3,6 @@ import copy
 import math
 import numpy as np
 import random
-import pi
+import pickle
+import cope.SE3lib as SE3
+import cope.axxbc
