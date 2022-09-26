@@ -9,4 +9,5 @@ import cope.axxbcovariance as axxb
 import matplotlib.pyplot as plt
 
 # Read data files
-filename = "data/pattern_tfs
+filename = "data/pattern_tfs"
+pattern_tfs =  pickle.load(open( filename, "rb
