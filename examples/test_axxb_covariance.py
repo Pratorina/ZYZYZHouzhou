@@ -10,4 +10,6 @@ import matplotlib.pyplot as plt
 
 # Read data files
 filename = "data/pattern_tfs"
-pattern_tfs =  pickle.load(open( filename, "rb
+pattern_tfs =  pickle.load(open( filename, "rb" ) )
+filename = "data/robot_tfs"
+ro
