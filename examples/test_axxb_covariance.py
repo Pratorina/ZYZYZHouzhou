@@ -12,4 +12,4 @@ import matplotlib.pyplot as plt
 filename = "data/pattern_tfs"
 pattern_tfs =  pickle.load(open( filename, "rb" ) )
 filename = "data/robot_tfs"
-ro
+robot_tfs =  pickle.load(open( filename,
