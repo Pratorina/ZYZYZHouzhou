@@ -15,4 +15,7 @@ filename = "data/robot_tfs"
 robot_tfs =  pickle.load(open( filename, "rb" ) )
 
 sigmaA = 1e-10*np.diag((1, 1, 1, 1, 1, 1))
-sigmaRa = sigmaA[3:
+sigmaRa = sigmaA[3:,3:]
+sigmata = sigmaA[:3,:3]
+
+sigmaRb = 
