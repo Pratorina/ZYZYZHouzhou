@@ -12,4 +12,6 @@ import matplotlib.pyplot as plt
 filename = "data/pattern_tfs"
 pattern_tfs =  pickle.load(open( filename, "rb" ) )
 filename = "data/robot_tfs"
-robot_tfs =  pickle.load(open( filename,
+robot_tfs =  pickle.load(open( filename, "rb" ) )
+
+sigmaA = 1e-10*np.dia
