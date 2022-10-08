@@ -18,4 +18,5 @@ sigmaA = 1e-10*np.diag((1, 1, 1, 1, 1, 1))
 sigmaRa = sigmaA[3:,3:]
 sigmata = sigmaA[:3,:3]
 
-sigmaRb = np.array([[  4.15625435e-05,  -2.88693145e-05,  -6.06
+sigmaRb = np.array([[  4.15625435e-05,  -2.88693145e-05,  -6.06526440e-06],
+                    [ -2.88693145e-
