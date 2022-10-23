@@ -32,4 +32,6 @@ Rxlist = []
 sigmaRx_list = []
 txlist = []
 sigmatx_list = []
-for n 
+for n in range(iters):
+    alpha = []
+    beta = [
