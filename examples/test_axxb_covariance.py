@@ -30,4 +30,6 @@ ksamples = 30
 iters = 500
 Rxlist = []
 sigmaRx_list = []
-t
+txlist = []
+sigmatx_list = []
+for n 
