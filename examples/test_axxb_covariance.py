@@ -34,4 +34,7 @@ txlist = []
 sigmatx_list = []
 for n in range(iters):
     alpha = []
-    beta = [
+    beta = []
+    ta = []
+    tb = []
+    # Generate d
