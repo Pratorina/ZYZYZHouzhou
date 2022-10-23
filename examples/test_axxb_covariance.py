@@ -27,4 +27,7 @@ sigmatb = np.array([[  1.95293655e-04,   2.12627214e-05,  -1.06674886e-05],
 
 datasize = len(pattern_tfs)
 ksamples = 30
-it
+iters = 500
+Rxlist = []
+sigmaRx_list = []
+t
