@@ -37,4 +37,6 @@ for n in range(iters):
     beta = []
     ta = []
     tb = []
-    # Generate d
+    # Generate data-A and B matrices
+    for i in range(ksamples):
+     
