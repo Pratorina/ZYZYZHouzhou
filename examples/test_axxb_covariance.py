@@ -39,4 +39,5 @@ for n in range(iters):
     tb = []
     # Generate data-A and B matrices
     for i in range(ksamples):
-     
+        # note this
+        rand_number_1 = int(np.random.
