@@ -41,4 +41,5 @@ for n in range(iters):
     for i in range(ksamples):
         # note this
         rand_number_1 = int(np.random.uniform(0,datasize))
-        rand_
+        rand_number_2 = int(np.random.uniform(0,datasize))
+    
