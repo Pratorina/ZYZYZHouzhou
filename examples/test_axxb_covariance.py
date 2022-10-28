@@ -40,4 +40,5 @@ for n in range(iters):
     # Generate data-A and B matrices
     for i in range(ksamples):
         # note this
-        rand_number_1 = int(np.random.
+        rand_number_1 = int(np.random.uniform(0,datasize))
+        rand_
