@@ -44,4 +44,5 @@ for n in range(iters):
         rand_number_2 = int(np.random.uniform(0,datasize))
         while rand_number_1==rand_number_2:
             rand_number_2 = int(np.random.uniform(0,datasize))
-        A = np.dot(robot_tfs[rand_number_1],np.linalg.inv(robot_t
+        A = np.dot(robot_tfs[rand_number_1],np.linalg.inv(robot_tfs[rand_number_2]))
+        B = np.dot(patt
