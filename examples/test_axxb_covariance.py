@@ -43,4 +43,4 @@ for n in range(iters):
         rand_number_1 = int(np.random.uniform(0,datasize))
         rand_number_2 = int(np.random.uniform(0,datasize))
         while rand_number_1==rand_number_2:
-    
+            rand_number_2 = int(np.random.u
