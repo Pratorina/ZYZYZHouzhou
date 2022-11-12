@@ -48,4 +48,5 @@ for n in range(iters):
         B = np.dot(pattern_tfs[rand_number_1],np.linalg.inv(pattern_tfs[rand_number_2]))
         alpha.append(SE3.RotToVec(A[:3,:3]))
         beta.append(SE3.RotToVec(B[:3,:3]))
-   
+        ta.append(A[:3,3])
+        tb.appe
