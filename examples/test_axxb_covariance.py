@@ -49,4 +49,5 @@ for n in range(iters):
         alpha.append(SE3.RotToVec(A[:3,:3]))
         beta.append(SE3.RotToVec(B[:3,:3]))
         ta.append(A[:3,3])
-        tb.appe
+        tb.append(B[:3,3])
+    Rxinit,txinit = ax
