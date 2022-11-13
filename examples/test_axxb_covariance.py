@@ -51,4 +51,5 @@ for n in range(iters):
         ta.append(A[:3,3])
         tb.append(B[:3,3])
     Rxinit,txinit = axxb.FCParkSolution(alpha,beta,ta,tb)
- 
+    
+    rot_res = axxb.IterativeS
