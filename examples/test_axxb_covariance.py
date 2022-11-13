@@ -50,4 +50,5 @@ for n in range(iters):
         beta.append(SE3.RotToVec(B[:3,:3]))
         ta.append(A[:3,3])
         tb.append(B[:3,3])
-    Rxinit,txinit = ax
+    Rxinit,txinit = axxb.FCParkSolution(alpha,beta,ta,tb)
+ 
