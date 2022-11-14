@@ -53,4 +53,4 @@ for n in range(iters):
     Rxinit,txinit = axxb.FCParkSolution(alpha,beta,ta,tb)
     
     rot_res = axxb.IterativeSolutionRot(beta,alpha,sigmaRa,sigmaRb,Rxinit)
-    
+    Rxhat, sigmaRx, rot_converged, betahat, alphahat, 
