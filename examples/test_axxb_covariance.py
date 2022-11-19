@@ -57,4 +57,5 @@ for n in range(iters):
     txhat, sigmatx, trans_converged = axxb.IterativeSolutionTrans(betahat, alphahat, ta, tb, Rxhat, sigmaRahat, sigmaRb, sigmata, sigmatb, sigmaRx,sigmaRbeta, txinit.reshape((3,1)), 10)
     if rot_converged and trans_converged:
         Rxlist.append(Rxhat)
-        sigmaRx_list.app
+        sigmaRx_list.append(sigmaRx)
+        txlist.append(txhat.res
