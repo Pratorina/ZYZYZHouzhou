@@ -60,3 +60,5 @@ for n in range(iters):
         sigmaRx_list.append(sigmaRx)
         txlist.append(txhat.reshape(3))
         sigmatx_list.append(sigmatx)
+    else:
+        print "Not converged!"
