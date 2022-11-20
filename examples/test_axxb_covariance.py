@@ -58,4 +58,5 @@ for n in range(iters):
     if rot_converged and trans_converged:
         Rxlist.append(Rxhat)
         sigmaRx_list.append(sigmaRx)
-        txlist.append(txhat.res
+        txlist.append(txhat.reshape(3))
+        sigmatx_list.append(sigmatx)
