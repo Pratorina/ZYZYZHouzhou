@@ -64,4 +64,4 @@ for n in range(iters):
         print "Not converged!"," rot_converged ",rot_converged ,"trans_converged ",trans_converged
 
         
-log
+logRx_list = [SE3.RotToVec(Rx) for Rx in 
