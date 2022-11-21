@@ -61,4 +61,4 @@ for n in range(iters):
         txlist.append(txhat.reshape(3))
         sigmatx_list.append(sigmatx)
     else:
-        print "Not converged!"
+        print "Not converged!"," rot_converged ",rot_converged ,"
