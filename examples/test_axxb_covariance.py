@@ -64,4 +64,6 @@ for n in range(iters):
         print "Not converged!"," rot_converged ",rot_converged ,"trans_converged ",trans_converged
 
         
-logRx_list = [SE3.RotToVec(Rx) for Rx in 
+logRx_list = [SE3.RotToVec(Rx) for Rx in Rxlist]
+avg_log = np.average(logRx_list,axis=0)
+av
