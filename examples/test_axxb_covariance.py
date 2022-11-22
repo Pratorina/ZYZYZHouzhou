@@ -66,4 +66,5 @@ for n in range(iters):
         
 logRx_list = [SE3.RotToVec(Rx) for Rx in Rxlist]
 avg_log = np.average(logRx_list,axis=0)
-av
+avg_Rx = SE3.VecToRot(avg_log)
+inv_avg_Rx =
