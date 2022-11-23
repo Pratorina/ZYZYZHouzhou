@@ -68,4 +68,7 @@ logRx_list = [SE3.RotToVec(Rx) for Rx in Rxlist]
 avg_log = np.average(logRx_list,axis=0)
 avg_Rx = SE3.VecToRot(avg_log)
 inv_avg_Rx = np.linalg.inv(avg_Rx)
-avg_tx = np.average(
+avg_tx = np.average(txlist,axis=0)
+        
+        
+xiRx_list =
