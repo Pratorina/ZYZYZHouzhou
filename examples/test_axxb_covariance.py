@@ -72,4 +72,5 @@ avg_tx = np.average(txlist,axis=0)
         
         
 xiRx_list =[SE3.RotToVec(np.dot(Rx,inv_avg_Rx)) for Rx in Rxlist]
-real_sigmaRx_using_avg = np.cov(np.tr
+real_sigmaRx_using_avg = np.cov(np.transpose(xiRx_list))
+print "Real sigmaRx,using 
