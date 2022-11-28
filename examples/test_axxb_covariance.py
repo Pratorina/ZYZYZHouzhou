@@ -82,4 +82,4 @@ print "Est avg sigma\n", np.average(sigmaRx_list, axis=0)
 xitx_list = [tx - avg_tx for tx in txlist]
 real_sigmatx_using_avg = np.cov(np.transpose(xitx_list))
 print "Real sigmatx, using avg\n ", real_sigmatx_using_avg
-pr
+print "Rand Est sigmatx\n ", random.choice(s
