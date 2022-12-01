@@ -87,4 +87,5 @@ avg_est_sigmatx = np.average(sigmatx_list,axis = 0)
 print "Avg est sigmatx:\n ", np.average(sigmatx_list,axis = 0)
 
 # Visualization
-axxb.VisualizeRealEstCov(np.real(real_sigmaRx_using_avg),avg_est_sigmaRx,-0.01*0.75,0.01*0.75,
+axxb.VisualizeRealEstCov(np.real(real_sigmaRx_using_avg),avg_est_sigmaRx,-0.01*0.75,0.01*0.75,-0.01*0.75,0.01*0.75,'rot')
+axxb.Visuali
