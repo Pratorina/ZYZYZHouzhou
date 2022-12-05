@@ -12,4 +12,6 @@ sigma = scale*np.diag((0.1,0.2,0.5,0.5,0.2,0.3))
 
 vec_Tinv = cope.TranToVec(np.linalg.inv(T))
 
-xi_vec_T
+xi_vec_Tinv = []
+for i in range(ksamples):
+    x
