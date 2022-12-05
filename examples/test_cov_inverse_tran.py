@@ -10,4 +10,6 @@ vec = cope.TranToVec(T)
 scale = 1e-3
 sigma = scale*np.diag((0.1,0.2,0.5,0.5,0.2,0.3))
 
-vec_Tinv = cop
+vec_Tinv = cope.TranToVec(np.linalg.inv(T))
+
+xi_vec_T
