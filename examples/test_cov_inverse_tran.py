@@ -14,4 +14,5 @@ vec_Tinv = cope.TranToVec(np.linalg.inv(T))
 
 xi_vec_Tinv = []
 for i in range(ksamples):
-    xisample = np.random.multivariate_normal(np
+    xisample = np.random.multivariate_normal(np.zeros(6),sigma)
+    Tsample = np.dot(cope.V
