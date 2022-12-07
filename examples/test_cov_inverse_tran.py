@@ -16,4 +16,5 @@ xi_vec_Tinv = []
 for i in range(ksamples):
     xisample = np.random.multivariate_normal(np.zeros(6),sigma)
     Tsample = np.dot(cope.VecToTran(xisample),T)
-    Tinvsample = np.linalg.i
+    Tinvsample = np.linalg.inv(Tsample)
+    xi_vec_Tinv.append(cope.TranToV
