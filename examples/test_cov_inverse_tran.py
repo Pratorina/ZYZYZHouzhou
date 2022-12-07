@@ -19,4 +19,4 @@ for i in range(ksamples):
     Tinvsample = np.linalg.inv(Tsample)
     xi_vec_Tinv.append(cope.TranToVec(np.dot(Tinvsample,T)))
     
-print np.cov(np.
+print np.cov(np.transpose(xi_vec_Tinv))[:3,:3]
