@@ -20,3 +20,4 @@ for i in range(ksamples):
     xi_vec_Tinv.append(cope.TranToVec(np.dot(Tinvsample,T)))
     
 print np.cov(np.transpose(xi_vec_Tinv))[:3,:3]
+print cope.CovInverseTran(
