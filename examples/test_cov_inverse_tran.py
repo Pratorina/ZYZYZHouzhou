@@ -17,4 +17,6 @@ for i in range(ksamples):
     xisample = np.random.multivariate_normal(np.zeros(6),sigma)
     Tsample = np.dot(cope.VecToTran(xisample),T)
     Tinvsample = np.linalg.inv(Tsample)
-    xi_vec_Tinv.append(cope.TranToV
+    xi_vec_Tinv.append(cope.TranToVec(np.dot(Tinvsample,T)))
+    
+print np.cov(np.
