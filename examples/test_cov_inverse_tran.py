@@ -21,4 +21,5 @@ for i in range(ksamples):
     
 print np.cov(np.transpose(xi_vec_Tinv))[:3,:3]
 print cope.CovInverseTran(T,sigma)[1][:3,:3]
-print cope.CovInverseT
+print cope.CovInverseTran(T,sigma)[1][3:,3:]
+print np.cov(np.tra
