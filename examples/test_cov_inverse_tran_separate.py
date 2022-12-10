@@ -8,3 +8,6 @@ T =  tr.random_rotation_matrix()
 T[:3,3] = tr.random_vector(3)
 R = T[:3,:3]
 Rinv = np.linalg.inv(R)
+t = T[:3,3]
+tinv = -np.dot(Rinv,t)
+scale = 1e-3
