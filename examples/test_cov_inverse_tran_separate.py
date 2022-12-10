@@ -11,4 +11,5 @@ Rinv = np.linalg.inv(R)
 t = T[:3,3]
 tinv = -np.dot(Rinv,t)
 scale = 1e-3
-sigmat = scale*np.diag(tr.rando
+sigmat = scale*np.diag(tr.random_vector(3))#(0.1,0.2,0.5))
+sigmaR 
