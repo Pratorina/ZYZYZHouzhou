@@ -17,4 +17,5 @@ sigmaR = scale*np.diag(tr.random_vector(3))#(0.5,0.2,0.3))
 xi_vec_Rinv = []
 xi_tinv = []
 
-for i
+for i in range(ksamples):
+    xisampleR = np.random
