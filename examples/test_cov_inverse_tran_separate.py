@@ -13,3 +13,8 @@ tinv = -np.dot(Rinv,t)
 scale = 1e-3
 sigmat = scale*np.diag(tr.random_vector(3))#(0.1,0.2,0.5))
 sigmaR = scale*np.diag(tr.random_vector(3))#(0.5,0.2,0.3))
+
+xi_vec_Rinv = []
+xi_tinv = []
+
+for i
