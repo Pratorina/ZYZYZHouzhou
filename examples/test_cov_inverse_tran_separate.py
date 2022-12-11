@@ -18,4 +18,4 @@ xi_vec_Rinv = []
 xi_tinv = []
 
 for i in range(ksamples):
-    xisampleR = np.random
+    xisampleR = np.random.multivariate_normal(np.zeros(3),sigmaR)
