@@ -19,4 +19,5 @@ xi_tinv = []
 
 for i in range(ksamples):
     xisampleR = np.random.multivariate_normal(np.zeros(3),sigmaR)
-    xisamplet = np.random.multivariate_normal(np.zeros(3),si
+    xisamplet = np.random.multivariate_normal(np.zeros(3),sigmat)
+    Rsample = np.dot(cope.VecT
