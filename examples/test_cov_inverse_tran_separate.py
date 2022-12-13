@@ -20,4 +20,5 @@ xi_tinv = []
 for i in range(ksamples):
     xisampleR = np.random.multivariate_normal(np.zeros(3),sigmaR)
     xisamplet = np.random.multivariate_normal(np.zeros(3),sigmat)
-    Rsample = np.dot(cope.VecT
+    Rsample = np.dot(cope.VecToRot(xisampleR),R)
+    Rinvsample = np.linalg.
