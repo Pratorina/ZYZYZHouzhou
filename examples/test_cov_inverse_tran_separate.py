@@ -23,4 +23,5 @@ for i in range(ksamples):
     Rsample = np.dot(cope.VecToRot(xisampleR),R)
     Rinvsample = np.linalg.inv(Rsample)
     tsample = t + xisamplet
-    tinvsample = -np.dot(Rinvsample,tsa
+    tinvsample = -np.dot(Rinvsample,tsample)
+    xi_vec_Rinv.append(cope.RotToVec(np.d
