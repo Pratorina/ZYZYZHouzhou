@@ -24,4 +24,5 @@ for i in range(ksamples):
     Rinvsample = np.linalg.inv(Rsample)
     tsample = t + xisamplet
     tinvsample = -np.dot(Rinvsample,tsample)
-    xi_vec_Rinv.append(cope.RotToVec(np.d
+    xi_vec_Rinv.append(cope.RotToVec(np.dot(Rsample,Rinv)))
+    xi_tinv.append(tinvsample 
