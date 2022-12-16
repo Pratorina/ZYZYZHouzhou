@@ -27,4 +27,6 @@ for i in range(ksamples):
     xi_vec_Rinv.append(cope.RotToVec(np.dot(Rsample,Rinv)))
     xi_tinv.append(tinvsample - tinv)
 res = cope.CovInverseTranWithSeparateRotTrans(R,sigmaR,t,sigmat)
-print np.cov(np.
+print np.cov(np.transpose(xi_vec_Rinv))
+print res[1]
+pri
