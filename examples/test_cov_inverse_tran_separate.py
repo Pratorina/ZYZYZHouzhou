@@ -30,3 +30,5 @@ res = cope.CovInverseTranWithSeparateRotTrans(R,sigmaR,t,sigmat)
 print np.cov(np.transpose(xi_vec_Rinv))
 print res[1]
 print np.cov(np.transpose(xi_tinv))
+print res[3]
+
