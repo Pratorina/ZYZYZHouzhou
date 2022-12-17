@@ -29,4 +29,4 @@ for i in range(ksamples):
 res = cope.CovInverseTranWithSeparateRotTrans(R,sigmaR,t,sigmat)
 print np.cov(np.transpose(xi_vec_Rinv))
 print res[1]
-pri
+print np.cov(np.transpose(xi_tinv))
