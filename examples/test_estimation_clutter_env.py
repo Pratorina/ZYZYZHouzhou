@@ -5,4 +5,8 @@ import cope.particlelib as ptcl
 import cope.transformation as tr
 import copy
 import time
-import 
+import pickle
+
+
+extents    = [0.13,0.1,0.3]
+mesh
