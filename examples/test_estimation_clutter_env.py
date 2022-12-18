@@ -9,4 +9,5 @@ import pickle
 
 
 extents    = [0.13,0.1,0.3]
-mesh
+mesh       = trimesh.creation.box(extents)
+pkl_fi
