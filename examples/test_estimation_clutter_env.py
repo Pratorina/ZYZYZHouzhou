@@ -10,4 +10,5 @@ import pickle
 
 extents    = [0.13,0.1,0.3]
 mesh       = trimesh.creation.box(extents)
-pkl_fi
+pkl_file   = open('data/woodstick_w_dict.p', 'rb')
+an
