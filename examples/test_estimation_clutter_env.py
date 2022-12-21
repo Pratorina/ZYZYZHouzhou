@@ -14,4 +14,5 @@ pkl_file   = open('data/woodstick_w_dict.p', 'rb')
 angle_dict = pickle.load(pkl_file)
 pkl_file.close()
 
-# ex
+# ext = [0.05,0.05,0.34]
+# other_box = trimesh.creation.box(
