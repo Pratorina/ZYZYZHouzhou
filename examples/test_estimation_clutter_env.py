@@ -19,4 +19,5 @@ pkl_file.close()
 # other_box.apply_translation([0.1,0.01,.02])
 
 # rack = trimesh.load_mesh('data/Rack1.ply')
-# ra
+# rack.apply_translation([-0.163,-0.01,-0.17])
+# r
