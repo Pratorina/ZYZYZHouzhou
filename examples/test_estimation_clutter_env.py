@@ -15,4 +15,7 @@ angle_dict = pickle.load(pkl_file)
 pkl_file.close()
 
 # ext = [0.05,0.05,0.34]
-# other_box = trimesh.creation.box(
+# other_box = trimesh.creation.box(ext)
+# other_box.apply_translation([0.1,0.01,.02])
+
+#
