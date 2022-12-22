@@ -20,4 +20,4 @@ pkl_file.close()
 
 # rack = trimesh.load_mesh('data/Rack1.ply')
 # rack.apply_translation([-0.163,-0.01,-0.17])
-# r
+# rack.apply_transform(tr.euler_matrix(-3.14/5.,0
