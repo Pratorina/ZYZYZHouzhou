@@ -27,4 +27,7 @@ pkl_file.close()
 
 
 pos_err = 2e-3
-nor_err
+nor_err = 5./180.0*np.pi
+
+# Uncertainty & params
+sigm
