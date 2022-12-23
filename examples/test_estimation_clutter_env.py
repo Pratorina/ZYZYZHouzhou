@@ -23,4 +23,8 @@ pkl_file.close()
 # rack.apply_transform(tr.euler_matrix(-3.14/5.,0,3.14/6.))
 # rack.apply_translation([0.075,-0.075,0])
 
-# clutter = copy.deepcopy
+# clutter = copy.deepcopy(other_box + rack)
+
+
+pos_err = 2e-3
+nor_err
