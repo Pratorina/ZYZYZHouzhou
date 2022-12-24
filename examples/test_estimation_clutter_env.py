@@ -34,4 +34,7 @@ sigma0 = np.diag([0.0001,0.0001,0.0001,0.09,0.09,0.09],0)
 sigma_desired = 0.09*np.diag([1e-6,1e-6,1e-6,1e-6,1e-6,1e-6],0)
 dim = 6 # 6 DOFs
 prune_percentage = 0.8
-ptcls0 = [np.eye(4)
+ptcls0 = [np.eye(4)]
+M = 6
+
+measurements = [[np.array([-0.06538186,
