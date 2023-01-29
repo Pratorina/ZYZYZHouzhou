@@ -77,4 +77,4 @@ T = np.array([[  9.74890642e-01,   1.97848726e-01,  -1.02196470e-01, -4.01176998
 # RANSAC
 n = 5  #  the minimum number of data values required to fit the model
 k = 50 # the maximum number of iterations allowed in the algorithm
-threshold = 3.  # a threshold 
+threshold = 3.  # a threshold value for determining when a data point f
