@@ -81,4 +81,4 @@ threshold = 3.  # a threshold value for determining when a data point fits a mod
 d = 7  # the number of good data values required to assert that a model fits well to data
 
 t0 = time.time()
-ransac_transformatio
+ransac_transformation, ransac_score, ransac_inliers_idx = ptcl.R
