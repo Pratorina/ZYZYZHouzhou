@@ -81,4 +81,4 @@ threshold = 3.  # a threshold value for determining when a data point fits a mod
 d = 7  # the number of good data values required to assert that a model fits well to data
 
 t0 = time.time()
-ransac_transformation, ransac_score, ransac_inliers_idx = ptcl.RansacParticle(n,k,threshold,d,mesh,angle_dict, ptcls
+ransac_transformation, ransac_score, ransac_inliers_idx = ptcl.RansacParticle(n,k,threshold,d,mesh,angle_dict, ptcls0, measurements, pos_err, nor_err, M, sig
