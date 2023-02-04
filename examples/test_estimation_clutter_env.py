@@ -82,4 +82,5 @@ d = 7  # the number of good data values required to assert that a model fits wel
 
 t0 = time.time()
 ransac_transformation, ransac_score, ransac_inliers_idx = ptcl.RansacParticle(n,k,threshold,d,mesh,angle_dict, ptcls0, measurements, pos_err, nor_err, M, sigma0, sigma_desired, prune_percentage,dim = 6, visualize = False)
-print 'Time', time.time
+print 'Time', time.time() -t0
+print 'Ransac transformation\n
