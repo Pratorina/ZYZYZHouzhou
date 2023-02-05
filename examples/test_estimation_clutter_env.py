@@ -85,4 +85,6 @@ ransac_transformation, ransac_score, ransac_inliers_idx = ptcl.RansacParticle(n,
 print 'Time', time.time() -t0
 print 'Ransac transformation\n', ransac_transformation
 print "Real transformation\n", T
-T_r = ransac_transform
+T_r = ransac_transformation
+print 'Dist trans:'
+print np.linalg.norm(T_
