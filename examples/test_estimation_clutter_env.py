@@ -89,4 +89,5 @@ T_r = ransac_transformation
 print 'Dist trans:'
 print np.linalg.norm(T_r[:3,3]-T[:3,3])
 print 'Dist rot:'
-print np.linalg.norm(SE3.RotToVec(np.dot(np.lin
+print np.linalg.norm(SE3.RotToVec(np.dot(np.linalg.inv(T_r[:3,:3]),T[:3,:3])))
+print 'Numb
