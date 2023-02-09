@@ -92,4 +92,4 @@ print 'Dist rot:'
 print np.linalg.norm(SE3.RotToVec(np.dot(np.linalg.inv(T_r[:3,:3]),T[:3,:3])))
 print 'Number of Inliers Detected:', len(ransac_inliers_idx)
 detected_inliers = [measurements[idx] for idx in ransac_inliers_idx] 
-ptcl.Visualize(mesh,T_r,measurements
+ptcl.Visualize(mesh,T_r,measurements)
