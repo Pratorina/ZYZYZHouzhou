@@ -7,4 +7,5 @@ import time
 starttime = time.time()
 tiny = 1e-5
 
-T1 =
+T1 = np.eye(4)
+sigma1 = np.diag([tiny,tiny,ti
