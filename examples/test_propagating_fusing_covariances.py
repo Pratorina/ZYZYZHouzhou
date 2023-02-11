@@ -16,4 +16,6 @@ sigma2 = np.diag([tiny,tiny,tiny,0.01,tiny,0.01],0)
 
 T3 = np.eye(4)
 T3[:3,3] = np.array([0,0,-0.03])
-sigma3 = np.dia
+sigma3 = np.diag([tiny,tiny,tiny,tiny,tiny,0.1],0)
+
+T4 =
