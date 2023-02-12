@@ -24,4 +24,6 @@ sigma4 = np.diag([tiny,tiny,tiny,tiny,tiny,tiny],0)
 
 
 
-T12, sigma12 = cope
+T12, sigma12 = cope.Propagating(T1,sigma1,T2,sigma2)
+
+T23, sigma23 
