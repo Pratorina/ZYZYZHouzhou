@@ -20,4 +20,8 @@ sigma3 = np.diag([tiny,tiny,tiny,tiny,tiny,0.1],0)
 
 T4 = np.eye(4)
 T4[:3,3] = np.array([0,0.14,0])
-sigma4 = np.diag([tiny,tiny,ti
+sigma4 = np.diag([tiny,tiny,tiny,tiny,tiny,tiny],0)
+
+
+
+T12, sigma12 = cope
