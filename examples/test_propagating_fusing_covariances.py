@@ -29,4 +29,4 @@ T12, sigma12 = cope.Propagating(T1,sigma1,T2,sigma2)
 T23, sigma23 = cope.Propagating(T12,sigma12,T3,sigma3)
 
 T34, sigma34 = cope.Propagating(T23,sigma23,T4,sigma4)
-print('Propagation 
+print('Propagation took %.4f seconds' % (time.time() - sta
