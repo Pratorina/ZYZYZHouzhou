@@ -32,4 +32,5 @@ T34, sigma34 = cope.Propagating(T23,sigma23,T4,sigma4)
 print('Propagation took %.4f seconds' % (time.time() - starttime))
 
 Tv = T34 
-Tv[:3,3] = Tv[:3
+Tv[:3,3] = Tv[:3,3] + np.array([0.001,0.002,-0.001])
+s
