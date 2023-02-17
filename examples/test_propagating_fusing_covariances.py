@@ -33,4 +33,6 @@ print('Propagation took %.4f seconds' % (time.time() - starttime))
 
 Tv = T34 
 Tv[:3,3] = Tv[:3,3] + np.array([0.001,0.002,-0.001])
-sigmav = np.diag([tiny,tiny,tiny,0.01,0.2,tiny
+sigmav = np.diag([tiny,tiny,tiny,0.01,0.2,tiny])
+
+Te,sigmae,iters = cope.Fusing([T34,Tv],
