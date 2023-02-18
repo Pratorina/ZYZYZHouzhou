@@ -36,3 +36,5 @@ Tv[:3,3] = Tv[:3,3] + np.array([0.001,0.002,-0.001])
 sigmav = np.diag([tiny,tiny,tiny,0.01,0.2,tiny])
 
 Te,sigmae,iters = cope.Fusing([T34,Tv],[sigma34,sigmav], maxiterations=10, retiter=True)
+
+print('Took %.4f seconds and %d iterati
