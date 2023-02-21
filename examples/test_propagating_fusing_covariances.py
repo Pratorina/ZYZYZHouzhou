@@ -39,4 +39,7 @@ Te,sigmae,iters = cope.Fusing([T34,Tv],[sigma34,sigmav], maxiterations=10, retit
 
 print('Took %.4f seconds and %d iterations' % (time.time() - starttime, iters))
 
-cope.Visualize([T12,T34,Te],[sigma12, sigm
+cope.Visualize([T12,T34,Te],[sigma12, sigma34,sigmae],100)
+# visualize(T,sigma,100,2)
+
+
