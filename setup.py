@@ -1,3 +1,5 @@
 from distutils.core import setup
 
-set
+setup(name='cope', 
+	version='1.0.0',
+	de
